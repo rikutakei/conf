@@ -1,0 +1,10 @@
+" for solarized colours
+set t_Co=256
+set background=dark
+colorscheme solarized
+
+"Remapping keys for faster buffer traversing
+nnoremap <silent> [j :bprevious<CR>
+nnoremap <silent> [k :bnext<CR>
+nnoremap <silent> [a :bfirst<CR>
+nnoremap <silent> [e :blast<CR>
