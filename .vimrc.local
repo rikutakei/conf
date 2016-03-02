@@ -9,6 +9,7 @@ nnoremap <silent> <leader>k :bnext<CR>
 nnoremap <silent> <leader>a :bfirst<CR>
 nnoremap <silent> <leader>e :blast<CR>
 
+let mapleader=' '
 nnoremap <leader>w :w<CR>
 nnoremap <leader>q :q<CR>
 nnoremap <leader>z zz
