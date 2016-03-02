@@ -115,4 +115,4 @@ fi
 
 # for solarized colour in terminal
 export TERM=screen-256color-bce
-
+set -o vi
