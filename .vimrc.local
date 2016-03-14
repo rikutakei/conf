@@ -19,3 +19,16 @@ vmap <C-c><C-c> <Plug>SendSelectionToTmux
 nmap <C-c><C-c> <Plug>NormalModeSendToTmux
 nmap <C-c>r <Plug>SetTmuxVars
 
+"enable matchit plugin:
+set nocompatible
+filetype plugin on
+runtime macros/matchit.vim
+
+
+"extra Tabular mappings:
+if isdirectory(expand("~/.vim/bundle/tabular"))
+"if exists(":Tabularize")
+    nmap <Leader>a% :Tabularize /%<CR>
+    vmap <Leader>a% :Tabularize /%<CR>
+endif
+
