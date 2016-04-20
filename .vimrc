@@ -66,14 +66,14 @@ syntax enable
 let g:solarized_termcolors=16
 let g:solarized_contrast="high"
 let g:solarized_visibility="normal"
-set background=dark
-colorscheme solarized
+set background=light
+colorscheme default
 
 " Extra variables for toggling colorschemes and background:
-let g:colschemelist=['default', 'solarized', 'lucius']
-let g:mybg=['dark', 'light']
-let g:currentcolscheme=1
-let g:currentbg=0
+let g:colschemelist=['default', 'solarized', 'lucius'] "List of colorscheme I want to cycle through
+let g:mybg=['dark', 'light'] "Background can be dark or light
+let g:currentcolscheme=0 "Counter to keep track of which colorscheme to use fromt the list
+let g:currentbg=1 "Counter for toggling background (0 or 1)
 
 " General use interface settings:
 set number "turn on line number
@@ -98,6 +98,10 @@ set history=1000 "Set the max number of history to remember
 set matchtime=3 "Highlight the matching paranthesis for n/10 seconds
 set laststatus=2 "Always have statusline
 set showbreak=↪\  "Use this symbol to show where the line is wrapped
+set nowrap "No text wrapping by default
+set notimeout
+set ttimeout
+set ttimeoutlen=10
 
 " General text/comment format settings:
 set autoindent
@@ -110,6 +114,10 @@ set shiftwidth=4 "Use indents of four spaces
 set nojoinspaces "prevents inserting two spaces after punctuation on a join (J)
 set formatoptions=croq1j "Set default text and/or comment format options (see :h fo-table for explanation of each flag):
 
+" Spell checking and dictionary:
+set dictionary=/usr/share/dict/words "Set the dictionary directory
+set spellfile=~/.vim/custom-dictionary.add "Set the file to put your custom words in
+
 " Turn off the annoying "show-the-special-symbol-in-Vim-screen" feature for
 " LaTeX:
 let g:tex_conceal = ""
@@ -121,6 +129,7 @@ let g:tex_conceal = ""
 let mapleader = " "
 
 " Mappings to (re)load .vimrc file:
+nnoremap gr :so ~/.vimrc<CR>
 nnoremap <Leader>r :so ~/.vimrc<CR>
 
 " Mappings to make saving and quitting easier:
@@ -137,7 +146,7 @@ nnoremap <silent> <C-w>\| <C-w>v
 nnoremap <silent> <Leader>= <C-w>=
 
 " Mappings for resizing windows:
-nnoremap <silent> <C-S-J> :exe "resize -4" <CR>
+nnoremap <silent> <C-S-J> :exe "resize -5" <CR>
 nnoremap <silent> <C-S-K> :exe "resize +5" <CR>
 nnoremap <silent> <C-S-H> :exe "vertical resize -5" <CR>
 nnoremap <silent> <C-S-L> :exe "vertical resize +5" <CR>
@@ -148,7 +157,7 @@ vnoremap <Leader>y "+y
 nnoremap <Leader>p :set paste<CR>"+p<CR>:set nopaste<CR>
 nnoremap <Leader>P :set paste<CR>"+P<CR>:set nopaste<CR>
 
-" Mappings for shifting text in visual mode without leaving:
+" Mappings for shifting text in visual mode without leaving visual mode:
 vnoremap < <gv
 vnoremap > >gv
 vnoremap = =gv
@@ -156,17 +165,30 @@ vnoremap = =gv
 " Mapping to join line without moving cursor position:
 nnoremap J mzJ`z
 
-" Mapping to split a line:
+" Mapping to split a line at the current cursor position:
 nnoremap S i<CR><ESC>^mwgk:silent! s/\v +$//<CR><BS>`w
 
 " Mapping for using dot command on the selection:
 vnoremap . :normal .<CR>
 
 " Mapping for toggling background colour:
-nnoremap <silent> <Leader>bg :call Togglebg()<CR>
+nnoremap <silent> bg :call Togglebg()<CR>
 
 " Mapping for toggling colorscheme (default or solarized):
-nnoremap <silent> <Leader>cs :call ToggleColScheme()<CR>
+nnoremap <silent> col :call ToggleColScheme()<CR>
+
+" Mapping for toggling search highlighting (only in normal mode):
+nnoremap <silent> <BS> :set hlsearch!<CR>
+
+" Mapping for toggling spell checking (only in normal mode):
+cnoremap <silent>  :set hlsearch!<CR>
+
+" If you want more key mapping ideas, see :h map-which-keys for a list of key
+" sequences not used by Vim.
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" My functions:
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " Function to toggle background colour:
 function! Togglebg()
@@ -177,21 +199,12 @@ endfunction
 " Function to toggle colourscheme in the list:
 function! ToggleColScheme()
 	:exec "colorscheme" (g:colschemelist[g:currentcolscheme])
-	:exec "set background=" . (g:mybg[g:currentbg])
-	if g:currentcolscheme < 2
+	if g:currentcolscheme < (len(g:colschemelist) - 1)
 		let g:currentcolscheme=g:currentcolscheme+1
 	else
 		let g:currentcolscheme=0
-		let g:currentbg=-(g:currentbg-1)
 	endif
-	let g:currentbg=-(g:currentbg-1)
 endfunction
-
-" Map backspace to remove highlighting from search (only in normal mode)
-nnoremap <silent> <BS> :nohlsearch<CR>
-
-" If you want more key mapping ideas, see :h map-which-keys for a list of key
-" sequences not used by Vim.
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Neocomplete settings:
@@ -275,5 +288,18 @@ endif
 let g:neosnippet#enable_snipmate_compatibility = 1
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Easy align settings:
+
+
+
+
+
+
+
+
+
+
+
+
 
 

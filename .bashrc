@@ -114,5 +114,6 @@ if ! shopt -oq posix; then
 fi
 
 # for solarized colour in terminal
-export TERM=screen-256color-bce
+export TERM="screen-256color"
 set -o vi
+alias tmux="tmux -2"
