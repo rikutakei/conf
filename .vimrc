@@ -25,6 +25,7 @@ set runtimepath+=~/.vim/bundle/neobundle.vim/
 
 "Automatically set what kind of 'make' to use for compiling vimproc.vim:
 let g:make = 'gmake'
+
 " If the system is GNU, use make and not gmake
 if system('uname -o') =~ '^GNU/'
 	let g:make = 'make'
@@ -50,6 +51,7 @@ NeoBundle 'Shougo/unite.vim'
 NeoBundle 'Shougo/vimproc.vim', {'build': {'unix': g:make}}
 NeoBundle 'tpope/vim-commentary'
 NeoBundle 'tpope/vim-surround'
+NeoBundle 'tpope/vim-repeat'
 NeoBundle 'altercation/vim-colors-solarized'
 NeoBundle 'jonathanfilip/vim-lucius' "you'll have to symlink or move the lucius.vim file into ~/.vim/colors/ directory for this to work
 
@@ -70,53 +72,53 @@ set background=light
 colorscheme default
 
 " Extra variables for toggling colorschemes and background:
-let g:colschemelist=['default', 'solarized', 'lucius'] "List of colorscheme I want to cycle through
-let g:mybg=['dark', 'light'] "Background can be dark or light
-let g:currentcolscheme=0 "Counter to keep track of which colorscheme to use fromt the list
-let g:currentbg=1 "Counter for toggling background (0 or 1)
+let g:colschemelist=['default', 'solarized', 'lucius'] " List of colorscheme I want to cycle through
+let g:mybg=['dark', 'light']                           " Background can be dark or light
+let g:currentcolscheme=0                               " Counter to keep track of which colorscheme to use fromt the list
+let g:currentbg=1                                      " Counter for toggling background (0 or 1)
 
 " General use interface settings:
-set number "turn on line number
-set incsearch "Turn on incremental search
-set hlsearch "Turn on search highlighting
-set smartcase "Turn on smart case
-set showmatch "Show matching brackets/paranthese
-set wildmenu "Show list of matches
+set number                                         " turn on line number
+set incsearch                                      " Turn on incremental search
+set hlsearch                                       " Turn on search highlighting
+set smartcase                                      " Turn on smart case
+set showmatch                                      " Show matching brackets/paranthese
+set wildmenu                                       " Show list of matches
 set wildmode=full
-set scrolloff=8 "Minimum lines to keep above/below the line with cursor
-set list "Display unprintable characters
-set listchars=tab:›\ ,trail:•,extends:❯,precedes:❮ "Use these characters for unprintable characters
-set backspace=indent,eol,start "Allow backspace from where you pressed insert
-set visualbell t_vb= "Remove visual and/or sound notification for errors
-set showmode "Display which mode you are in
-set virtualedit=block "Allow you to move cursor to position with no characters (e.g past eol)
-" set gdefault "If you want to make the g flag default for substitution, uncomment this line
-set splitbelow "Horizontal split will split the window below
-set splitright "Vertical split will split the window to the right
-set ruler "Display the whereabouts you are in the file
-set history=1000 "Set the max number of history to remember
-set matchtime=3 "Highlight the matching paranthesis for n/10 seconds
-set laststatus=2 "Always have statusline
-set showbreak=↪\  "Use this symbol to show where the line is wrapped
-set nowrap "No text wrapping by default
-set notimeout
-set ttimeout
-set ttimeoutlen=10
+set scrolloff=8                                    " Minimum lines to keep above/below the line with cursor
+set list                                           " Display unprintable characters
+set listchars=tab:›\ ,trail:•,extends:❯,precedes:❮ " Use these characters for unprintable characters
+set backspace=indent,eol,start                     " Allow backspace from where you pressed insert
+set visualbell t_vb=                               " Remove visual and/or sound notification for errors
+set showmode                                       " Display which mode you are in
+set virtualedit=block                              " Allow you to move cursor to position with no characters (e.g past eol)
+                                                   " set gdefault                                     " If you want to make the g flag default for substitution, uncomment this line
+set splitbelow                                     " Horizontal split will split the window below
+set splitright                                     " Vertical split will split the window to the right
+set ruler                                          " Display the whereabouts you are in the file
+set history=1000                                   " Set the max number of history to remember
+set matchtime=3                                    " Highlight the matching paranthesis for n/10 seconds
+set laststatus=2                                   " Always have statusline
+set showbreak=↪\                                   " Use this symbol to show where the line is wrapped
+set nowrap                                         " No text wrapping by default
+set notimeout                                      " Don't time out for key codes and/or mappings
+set ttimeout                                       " Together with the line above, this will set it to time out for key codes, but not mappings
+set ttimeoutlen=10                                 " Set time out length to 10 milliseconds
 
 " General text/comment format settings:
 set autoindent
-set linebreak " When wrapping lines, break at spaces and tabs only
+set linebreak                  " When wrapping lines, break at spaces and tabs only
 " set breakat=" ^I!@*-+;:,./?" " Default setting for breakat is good enough, but it's here if you want to change it
-set textwidth=80 "Set maximum characters per line in a file (only for comments)
-set tabstop=4 "An indentation every four columns
-set softtabstop=4 "let backsapce delete indent
-set shiftwidth=4 "Use indents of four spaces
-set nojoinspaces "prevents inserting two spaces after punctuation on a join (J)
-set formatoptions=croq1j "Set default text and/or comment format options (see :h fo-table for explanation of each flag):
+set textwidth=80               " Set maximum characters per line in a file (only for comments)
+set tabstop=4                  " An indentation every four columns
+set softtabstop=4              " let backsapce delete indent
+set shiftwidth=4               " Use indents of four spaces
+set nojoinspaces               " prevents inserting two spaces after punctuation on a join (J)
+set formatoptions=croq1j       " Set default text and/or comment format options (see :h fo-table for explanation of each flag):
 
 " Spell checking and dictionary:
-set dictionary=/usr/share/dict/words "Set the dictionary directory
-set spellfile=~/.vim/custom-dictionary.add "Set the file to put your custom words in
+set dictionary=/usr/share/dict/words       " Set the dictionary directory
+set spellfile=~/.vim/custom-dictionary.add " Set the file to put your custom words in
 
 " Turn off the annoying "show-the-special-symbol-in-Vim-screen" feature for
 " LaTeX:
@@ -129,7 +131,7 @@ let g:tex_conceal = ""
 let mapleader = " "
 
 " Mappings to (re)load .vimrc file:
-nnoremap gr :so ~/.vimrc<CR>
+nnoremap    gr     :so ~/.vimrc<CR>
 nnoremap <Leader>r :so ~/.vimrc<CR>
 
 " Mappings to make moving around wrapped text easier:
@@ -145,8 +147,8 @@ nnoremap <Leader>j :bn<CR>
 nnoremap <Leader>k :bp<CR>
 
 " Mappings for splitting windows:
-nnoremap <silent> <C-w>- <C-w>s
-nnoremap <silent> <C-w>\| <C-w>v
+nnoremap <silent>  <C-w>-   <C-w>s
+nnoremap <silent>  <C-w>\|  <C-w>v
 nnoremap <silent> <Leader>= <C-w>=
 
 " Mappings for resizing windows:
@@ -213,10 +215,10 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Neocomplete settings:
 
-let g:acp_enableAtStartup = 0 " Disable AutoComplPop.
+let g:acp_enableAtStartup = 0           " Disable AutoComplPop.
 let g:neocomplete#enable_at_startup = 1 " Use neocomplete.
 let g:neocomplete#enable_smart_case = 1 " Use smartcase.
-let g:neocomplete#max_list = 4 " Set the maximum number of options shown in the popup menu
+let g:neocomplete#max_list = 4          " Set the maximum number of options shown in the popup menu
 let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
 
 " Define dictionary.
@@ -251,11 +253,11 @@ inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
 "inoremap <expr><Space> pumvisible() ? "\<C-y>" : "\<Space>"
 
 " Enable omni completion.
-autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+autocmd FileType      css      setlocal    omnifunc=csscomplete#CompleteCSS
+autocmd FileType html,markdown setlocal   omnifunc=htmlcomplete#CompleteTags
+autocmd FileType  javascript   setlocal omnifunc=javascriptcomplete#CompleteJS
+autocmd FileType    python     setlocal    omnifunc=pythoncomplete#Complete
+autocmd FileType      xml      setlocal   omnifunc=xmlcomplete#CompleteTags
 
 " For smart TAB completion - this function will show the popup menu with
 " recommended words.
@@ -294,14 +296,36 @@ let g:neosnippet#enable_snipmate_compatibility = 1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Easy align settings:
 
+" Turn off foldmethod temporarily when using easy align:
+let g:easy_align_bypass_fold=1
 
+" Mappings for interactive aligning:
+nmap  ga   <Plug>(EasyAlign)
+vmap <CR>  <Plug>(EasyAlign)
 
+" Mappings for filter aligning:
+vmap <C-a> <Plug>(EasyAlign)<C-f>g/
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Tabular settings:
 
+" Automatically tabularize text in insert mode when | is encountered:
+inoremap <Bar> <Bar><Esc>:call <SID>align('<Bar>')<CR>a
+inoremap & &<Esc>:call <SID>align('&')<CR>a
 
-
-
-
+" Function to generalise Tim Pope's gist for any character passed to the
+" function (you will have to use a similar mapping as above):
+function! s:align(char)
+	" let tmp = substitute(a:char, '"', '', 'g')
+	let p = '^.*'.a:char.'.*'.a:char.'.*$'
+	if exists(':Tabularize') && getline('.') =~# '^.*'.a:char && (getline(line('.')-1) =~# p || getline(line('.')+1) =~# p)
+		let column = strlen(substitute(getline('.')[0:col('.')],'[^'.a:char.']','','g'))
+		let position = strlen(matchstr(getline('.')[0:col('.')],'.*'.a:char.'.*\zs.*'))
+		exec "Tabularize/".a:char."/l1"
+		normal! 0
+		call search(repeat('[^'.a:char.']*'.a:char,column).'.\{-\}'.repeat('.',position),'ce',line('.'))
+	endif
+endfunction
 
 
 
