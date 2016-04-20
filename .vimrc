@@ -132,6 +132,10 @@ let mapleader = " "
 nnoremap gr :so ~/.vimrc<CR>
 nnoremap <Leader>r :so ~/.vimrc<CR>
 
+" Mappings to make moving around wrapped text easier:
+nnoremap j gj
+nnoremap k gk
+
 " Mappings to make saving and quitting easier:
 nnoremap <Leader>w :w<CR>
 nnoremap <Leader>q :q<CR>
@@ -172,7 +176,7 @@ nnoremap S i<CR><ESC>^mwgk:silent! s/\v +$//<CR><BS>`w
 vnoremap . :normal .<CR>
 
 " Mapping for toggling background colour:
-nnoremap <silent> bg :call Togglebg()<CR>
+nnoremap <silent> cob :call Togglebg()<CR>
 
 " Mapping for toggling colorscheme (default or solarized):
 nnoremap <silent> col :call ToggleColScheme()<CR>
