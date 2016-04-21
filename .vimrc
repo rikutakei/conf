@@ -43,12 +43,12 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 "Manage other plugins (i.e. your custom plugins):
 NeoBundle 'godlygeek/tabular'
 NeoBundle 'junegunn/vim-easy-align'
-NeoBundle 'Shougo/context_filetype.vim'
+NeoBundle 'Shougo/context_filetype.vim' " TODO: checkout precious.vim and/or quickrun
 NeoBundle 'Shougo/neocomplete.vim'
-NeoBundle 'Shougo/neosnippet.vim'
-NeoBundle 'Shougo/neosnippet-snippets'
-NeoBundle 'Shougo/unite.vim'
-NeoBundle 'Shougo/vimproc.vim', {'build': {'unix': g:make}}
+NeoBundle 'Shougo/neosnippet.vim' "TODO: R snippets?
+NeoBundle 'Shougo/neosnippet-snippets' "TODO: have a look at ulti snips
+NeoBundle 'Shougo/unite.vim' "TODO: look at how to actually work this
+NeoBundle 'Shougo/vimproc.vim', {'build': {'unix': g:make}} "TODO: try remap some commands
 NeoBundle 'tpope/vim-commentary'
 NeoBundle 'tpope/vim-surround'
 NeoBundle 'tpope/vim-repeat'
@@ -232,9 +232,14 @@ let g:neocomplete#sources#dictionary#dictionaries = {
 if !exists('g:neocomplete#keyword_patterns')
 	let g:neocomplete#keyword_patterns = {}
 endif
-let g:neocomplete#keyword_patterns['default'] = '\h\w*'
 
-" Recommended key-mappings.
+"Define the pattern to store/match for auto-completion (the default setting is
+"'\h\w*', which mean start of the word to the end of the word).
+"'\h[\w*[-_]\=]*' means from the start of a word to the end of a word that
+"contains none or one - or _ characters:
+let g:neocomplete#keyword_patterns['default'] = '\h[\w*[-_]\=]*'
+
+" Recommended key-mappings from the manual:
 
 " <CR>: close popup and save completion without returning.
 inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
@@ -253,11 +258,11 @@ inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
 "inoremap <expr><Space> pumvisible() ? "\<C-y>" : "\<Space>"
 
 " Enable omni completion.
-autocmd FileType      css      setlocal    omnifunc=csscomplete#CompleteCSS
-autocmd FileType html,markdown setlocal   omnifunc=htmlcomplete#CompleteTags
-autocmd FileType  javascript   setlocal omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType    python     setlocal    omnifunc=pythoncomplete#Complete
-autocmd FileType      xml      setlocal   omnifunc=xmlcomplete#CompleteTags
+autocmd FileType css           setlocal omnifunc=csscomplete#CompleteCSS
+autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+autocmd FileType javascript    setlocal omnifunc=javascriptcomplete#CompleteJS
+autocmd FileType python        setlocal omnifunc=pythoncomplete#Complete
+autocmd FileType xml           setlocal omnifunc=xmlcomplete#CompleteTags
 
 " For smart TAB completion - this function will show the popup menu with
 " recommended words.
@@ -310,11 +315,13 @@ vmap <C-a> <Plug>(EasyAlign)<C-f>g/
 " Tabular settings:
 
 " Automatically tabularize text in insert mode when | is encountered:
+" TODO: need to put these into language specific files for loading
 inoremap <Bar> <Bar><Esc>:call <SID>align('<Bar>')<CR>a
 inoremap & &<Esc>:call <SID>align('&')<CR>a
 
-" Function to generalise Tim Pope's gist for any character passed to the
-" function (you will have to use a similar mapping as above):
+" Function to generalise Tim Pope's gist so any character passed to the function
+" is used to automatically create tables (you will have to use a similar mapping
+" as above):
 function! s:align(char)
 	" let tmp = substitute(a:char, '"', '', 'g')
 	let p = '^.*'.a:char.'.*'.a:char.'.*$'
@@ -326,6 +333,46 @@ function! s:align(char)
 		call search(repeat('[^'.a:char.']*'.a:char,column).'.\{-\}'.repeat('.',position),'ce',line('.'))
 	endif
 endfunction
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Surround.vim settings:
+
+
+" Automatic surrounding brackets:
+imap ( <Plug>Isurround)
+imap { <Plug>Isurround}
+imap [ <Plug>Isurround]
+imap " <Plug>Isurround"
+imap ` <Plug>Isurround`
+
+" Span three lines when you press enter straight after making brackets:
+imap (<CR> <Plug>ISurround)
+imap {<CR> <Plug>ISurround}
+imap [<CR> <Plug>ISurround]
+
+" TODO: add a function to skip the closing braces
+
+" Add a function so that the <BS> within an empty three-line-spanning braces are
+" put into a single line:
+function! SmartBackSpace()
+	let l = getline(line('.')-1).getline('.').getline(line('.')+1)
+	let cp = line('.')-1
+	" if match(l, '[\s\n]*')
+	" 	return '\<BS>\<BS>'
+	" endif
+	if match(l, '.*(\zs[\s\n]*\ze)') < 0
+		let l = substitute(l, '.*(\zs\s*\ze)','','g')
+		call setline(cp, l)
+		call setline(cp+1, '')
+		call setline(cp+2, '')
+		return 'hello'
+	else
+		return "\<BS>"
+	endif
+endfunction
+
+inoremap <BS> <C-r>=SmartBackSpace()<CR>
+
 
 
 
