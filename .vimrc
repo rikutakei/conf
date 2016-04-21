@@ -355,19 +355,23 @@ imap [<CR> <Plug>ISurround]
 " Add a function so that the <BS> within an empty three-line-spanning braces are
 " put into a single line:
 function! SmartBackSpace()
-	let l = getline(line('.')-1).getline('.').getline(line('.')+1)
-	let cp = line('.')-1
-	" if match(l, '[\s\n]*')
-	" 	return '\<BS>\<BS>'
-	" endif
-	if match(l, '.*(\zs[\s\n]*\ze)') < 0
+	let cl = line('.')
+	let l = getline(cl-1).getline(cl).getline(cl+1)
+	if match(l, '.*(\zs\s*\ze)') > 0
 		let l = substitute(l, '.*(\zs\s*\ze)','','g')
-		call setline(cp, l)
-		call setline(cp+1, '')
-		call setline(cp+2, '')
-		return 'hello'
-	else
-		return "\<BS>"
+		let cn = strlen(matchstr(l, '.*)\s*$'))
+		let cursor_pos = [bufnr('%')-1, cl-1, cn, 0]
+		call setline(cl-1, l)
+		call setline(cl, '')
+		call setline(cl+1, '')
+		call setpos('.',cursor_pos)
+	else " TODO: fix the delete/backspace function
+		let save_pos = getpos('.')
+		let l = getline('.')
+		let l = l[0:save_pos[2]-2].l[save_pos[2]:]
+		call setline(line('.'), l)
+		let save_pos[2] = save_pos[2]-1
+		call setpos('.',save_pos)
 	endif
 endfunction
 
