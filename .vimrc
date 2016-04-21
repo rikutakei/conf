@@ -355,6 +355,7 @@ imap [<CR> <Plug>ISurround]
 " Add a function so that the <BS> within an empty three-line-spanning braces are
 " put into a single line:
 function! s:SmartBackSpace()
+	let a = ''
 	let cl = line('.')   " current line number
 	let cp = 0           " count previous lines
 	let ca = 0           " count lines after the current line
@@ -375,25 +376,37 @@ function! s:SmartBackSpace()
 		let la = getline(cl+ca)
 	endwhile
 	"Delete the blank spaces in between the braces
+	" TODO: add conditional for when you're not in between braces, but in
+	" between lines of blank spaces
 	let l = lp.la
-	if match(l, '^.*(\zs\s\n+\ze)$')
-		let l = substitute(l, '^.*(\zs\s*\n*)\ze$','','g')
-		call setline(cl-cp, l)
-		let cursor_pos = [bufnr('%')-1, cl+ca, 0, 0]
-		call setpos('.',cursor_pos)
-		let x = cp+ca
+	if match(l, '^.*(\zs\s\n+\ze).*$')
+		let a = call(function('DeleteBetweenBraces'), [l, cl, cp, ca])
+		return a
+	endif
+endfunction
+
+" Just a helping function to 'delete' a line
+function! DeleteLine()
+	return "\<C-u>"
+endfunction
+
+" Function to delete the blanklines between the innermost braces
+" TODO: add a general brace_char variable to identify what kind of brackets
+" you're in between
+" TODO: undo for the smart backspace isn't working - ned to look into that
+function! DeleteBetweenBraces(l, cl, cp, ca)
+		let tmp_line = substitute(a:l, '^.*(\zs\s*\n*)\ze.*$','','g')
+		call setline(a:cl-a:cp, tmp_line)
+		let cursor_pos = [bufnr('%')-1, a:cl+a:ca, 0, 0]
+		call setpos('.', cursor_pos)
+		let x = a:cp+a:ca
 		let a = ''
-		let tmp = Helper() "use C-U to delete lines"
+		let tmp = DeleteLine()
 		while x > 0
 			let a = a.tmp
 			let x = x-1
 		endwhile
 		return a
-	endif
-endfunction
-
-function! Helper()
-	return "\<C-u>"
 endfunction
 
 inoremap <BS> <C-R>=<SID>SmartBackSpace()<CR>
