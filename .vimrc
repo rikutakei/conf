@@ -354,31 +354,46 @@ imap [<CR> <Plug>ISurround]
 
 " Add a function so that the <BS> within an empty three-line-spanning braces are
 " put into a single line:
-function! SmartBackSpace()
-	let cl = line('.')
-	let l = getline(cl-1).getline(cl).getline(cl+1)
-	if match(l, '.*(\zs\s*\ze)') > 0
-		let l = substitute(l, '.*(\zs\s*\ze)','','g')
-		let cn = strlen(matchstr(l, '.*)\s*$'))
-		let cursor_pos = [bufnr('%')-1, cl-1, cn, 0]
-		call setline(cl-1, l)
-		call setline(cl, '')
-		call setline(cl+1, '')
+function! s:SmartBackSpace()
+	let cl = line('.')   " current line number
+	let cp = 0           " count previous lines
+	let ca = 0           " count lines after the current line
+	let gl = getline(cl) " get the current line content
+	let la = gl          " content of the non-whitespace line after the 'current' line
+	let lp = gl          " content of the non-whitespace line before the 'current' line
+	"If the current line contains a non-blank character before the cursor, use normal deletion
+	if !(gl =~ '^\s*$')
+		return "\<C-h>"
+	endif
+	"Find the next line with non-blank chars before/after current line
+	while ((match(lp, '^.*(\zs\s*$') < 0) || !(lp =~ '\S$'))
+		let cp = cp+1
+		let lp = getline(cl-cp)
+	endwhile
+	while ((match(la, '^\s*).*$') < 0) || !(la =~ '\S$'))
+		let ca = ca+1
+		let la = getline(cl+ca)
+	endwhile
+	"Delete the blank spaces in between the braces
+	let l = lp.la
+	if match(l, '^.*(\zs\s\n+\ze)$')
+		let l = substitute(l, '^.*(\zs\s*\n*)\ze$','','g')
+		call setline(cl-cp, l)
+		let cursor_pos = [bufnr('%')-1, cl+ca, 0, 0]
 		call setpos('.',cursor_pos)
-	else " TODO: fix the delete/backspace function
-		let save_pos = getpos('.')
-		let l = getline('.')
-		let l = l[0:save_pos[2]-2].l[save_pos[2]:]
-		call setline(line('.'), l)
-		let save_pos[2] = save_pos[2]-1
-		call setpos('.',save_pos)
+		let x = cp+ca
+		let a = ''
+		let tmp = Helper() "use C-U to delete lines"
+		while x > 0
+			let a = a.tmp
+			let x = x-1
+		endwhile
+		return a
 	endif
 endfunction
 
-inoremap <BS> <C-r>=SmartBackSpace()<CR>
+function! Helper()
+	return "\<C-u>"
+endfunction
 
-
-
-
-
-
+inoremap <BS> <C-R>=<SID>SmartBackSpace()<CR>
