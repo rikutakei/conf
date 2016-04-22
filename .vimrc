@@ -103,6 +103,7 @@ set nowrap                                         " No text wrapping by default
 set notimeout                                      " Don't time out for key codes and/or mappings
 set ttimeout                                       " Together with the line above, this will set it to time out for key codes, but not mappings
 set ttimeoutlen=10                                 " Set time out length to 10 milliseconds
+set pumheight=5                                    " Set how many words are shown in the popup menu for any completion
 
 " General text/comment format settings:
 set autoindent
@@ -337,8 +338,31 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Surround.vim settings:
 
+" Create a dictionary for matching braces:
+let g:open_brackets = {  "{" : "}", "<" : ">",  "(" : ")",  "[" : "]", '"' : '"',  "`" : "`" }
+let g:close_brackets = { "}" : "{", ">" : "<", ")" : "(", "]" : "[",  '"' : '"',  "`" : "`" }
 
-" Automatic surrounding brackets:
+" Function to add new pairs into the dictionary of matching pairs
+" Note: char1 must be the open bracket, and char2 is the closing bracket
+function! AddPairs(char1, char2)
+	let g:open_brackets[a:char1] = a:char2
+	let g:close_brackets[a:char2] = a:char1
+	return
+endfunction
+
+" Function to remove pairs out of the dictionary of matching pairs
+" Note: char1 must be the open bracket, and char2 is the closing bracket
+function! RemovePairs(char1, char2)
+	if has_key(g:open_brackets, a:char1) && has_key(g:close_brackets, a:char2)
+		unlet g:open_brackets[a:char1] = a:char2
+		unlet g:close_brackets[a:char2] = a:char1
+	else
+		echo "The pairs are not in the list of matching pairs."
+	endif
+	return
+endfunction
+
+" Automatic surrounding brackets (see Tim Pop's surround source code):
 imap ( <Plug>Isurround)
 imap { <Plug>Isurround}
 imap [ <Plug>Isurround]
@@ -346,6 +370,7 @@ imap " <Plug>Isurround"
 imap ` <Plug>Isurround`
 
 " Span three lines when you press enter straight after making brackets:
+" (see Tim Pope's surround source code)
 imap (<CR> <Plug>ISurround)
 imap {<CR> <Plug>ISurround}
 imap [<CR> <Plug>ISurround]
@@ -354,33 +379,59 @@ imap [<CR> <Plug>ISurround]
 
 " Add a function so that the <BS> within an empty three-line-spanning braces are
 " put into a single line:
+" TODO: consider lines that are empty but commented
+" TODO: also look into tabbed lines - it messes up the C-U feature (gives off by
+" N error)
+" TODO: condition for deleting the lines until EOF/BOF (i.e. dG/dgg commands in
+" normal)
 function! s:SmartBackSpace()
 	let a = ''
+	let open = escape(join(keys(g:open_brackets), ''), "'[")
+	let close = escape(join(keys(g:close_brackets), ''), "']")
 	let cl = line('.')   " current line number
 	let cp = 0           " count previous lines
 	let ca = 0           " count lines after the current line
 	let gl = getline(cl) " get the current line content
 	let la = gl          " content of the non-whitespace line after the 'current' line
 	let lp = gl          " content of the non-whitespace line before the 'current' line
-	"If the current line contains a non-blank character before the cursor, use normal deletion
+
+	"If the current line contains a non-blank character before the cursor, use
+	"normal deletion
 	if !(gl =~ '^\s*$')
 		return "\<C-h>"
-	endif
-	"Find the next line with non-blank chars before/after current line
-	while ((match(lp, '^.*(\zs\s*$') < 0) || !(lp =~ '\S$'))
-		let cp = cp+1
-		let lp = getline(cl-cp)
-	endwhile
-	while ((match(la, '^\s*).*$') < 0) || !(la =~ '\S$'))
-		let ca = ca+1
-		let la = getline(cl+ca)
-	endwhile
-	"Delete the blank spaces in between the braces
-	" TODO: add conditional for when you're not in between braces, but in
-	" between lines of blank spaces
-	let l = lp.la
-	if match(l, '^.*(\zs\s\n+\ze).*$')
-		let a = call(function('DeleteBetweenBraces'), [l, cl, cp, ca])
+	" elseif !(gl =~ '^$')
+	" 	return DeleteLine()
+	else
+		"Find the next line with non-blank chars before/after current line
+		while !(!(match(lp, '^.*['.open.']\zs\s*$') < 0) || (lp =~ '\S$') || (lp =~ '%^'))
+			let cp = cp+1
+			let lp = getline(cl-cp)
+		endwhile
+		echom cp
+		while !(!(match(la, '^\s*['.close.'].*$') < 0) || (la =~ '\S$') || (la =~ '%$'))
+			let ca = ca+1
+			let la = getline(cl+ca)
+		endwhile
+		echom ca
+		"Delete the blank spaces in between the braces
+		let l = lp.la
+		let regex1 = '^.*['.open.']\zs\s*$'
+		let regex2 = '^\s*\zs['.close.']\ze.*$'
+		let char1 = matchstr(lp, regex1)
+		let char2 = matchstr(la, regex2)
+		if has_key(g:open_brackets, char1)
+			if has_key(g:close_brackets, char2)
+				let a = call(function('DeleteBetweenBraces'), [cl, cp, ca])
+				return a
+			else
+				let a = call(function('DeleteBetweenBraces'), [cl, cp-1, ca])
+				return a
+			endif
+		else
+			let a = call(function('DeleteBetweenBraces'), [cl, cp-2, ca])
+			return a
+		endif
+		let a = call(function('DeleteBetweenBraces'), [cl, cp-2, ca])
 		return a
 	endif
 endfunction
@@ -391,22 +442,38 @@ function! DeleteLine()
 endfunction
 
 " Function to delete the blanklines between the innermost braces
-" TODO: add a general brace_char variable to identify what kind of brackets
-" you're in between
-" TODO: undo for the smart backspace isn't working - ned to look into that
-function! DeleteBetweenBraces(l, cl, cp, ca)
-		let tmp_line = substitute(a:l, '^.*(\zs\s*\n*)\ze.*$','','g')
-		call setline(a:cl-a:cp, tmp_line)
-		let cursor_pos = [bufnr('%')-1, a:cl+a:ca, 0, 0]
-		call setpos('.', cursor_pos)
-		let x = a:cp+a:ca
-		let a = ''
-		let tmp = DeleteLine()
-		while x > 0
-			let a = a.tmp
-			let x = x-1
-		endwhile
-		return a
+function! DeleteBetweenBraces(cl, cp, ca)
+	let a = SetCursor(a:ca)
+	let x = a:cp+a:ca
+	let tmp = DeleteLine()
+	while x >= 0
+		let a = a.tmp
+		let x = x-1
+	endwhile
+	return a
 endfunction
 
 inoremap <BS> <C-R>=<SID>SmartBackSpace()<CR>
+
+function! SetCursor(ca)
+	let t = ''
+	let c = a:ca
+	while c > 0
+		let t = t."\<C-g>\<C-j>"
+		let c = c-1
+	endwhile
+	return t."\<Home>"
+endfunction
+
+
+
+
+
+
+
+
+
+
+
+
+
