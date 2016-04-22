@@ -18,7 +18,6 @@ if &compatible
 	set nocompatible
 endif
 
-
 "Include the neobundle directory in the runtime path, so plugins are visible to
 "Vim
 set runtimepath+=~/.vim/bundle/neobundle.vim/
@@ -152,10 +151,10 @@ nnoremap <silent>  <C-w>\|  <C-w>v
 nnoremap <silent> <Leader>= <C-w>=
 
 " Mappings for resizing windows:
-nnoremap <silent> <C-S-J> :exe "resize -5" <CR>
-nnoremap <silent> <C-S-K> :exe "resize +5" <CR>
-nnoremap <silent> <C-S-H> :exe "vertical resize -5" <CR>
-nnoremap <silent> <C-S-L> :exe "vertical resize +5" <CR>
+" nnoremap <silent> <C-J> :exe "resize -5" <CR>
+" nnoremap <silent> <C-K> :exe "resize +5" <CR>
+" nnoremap <silent> <C-H> :exe "vertical resize -5" <CR>
+" nnoremap <silent> <C-L> :exe "vertical resize +5" <CR>
 
 " Mappings for system clipboard yank:
 nnoremap <Leader>y "+y
@@ -277,17 +276,18 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Neosnippet settings:
 
+
 " Plugin key-mappings.
 imap <C-k> <Plug>(neosnippet_expand_or_jump)
 smap <C-k> <Plug>(neosnippet_expand_or_jump)
 xmap <C-k> <Plug>(neosnippet_expand_target)
 
 " SuperTab like snippets' behavior.
-map <expr><TAB>
+imap <expr><TAB>
 			\ pumvisible() ? "\<C-n>" :
 			\ neosnippet#expandable_or_jumpable() ?
 			\    "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
-map <expr><TAB> neosnippet#expandable_or_jumpable() ?
+smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
 			\ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
 
 " For conceal markers.
