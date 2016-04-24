@@ -470,9 +470,9 @@ function! s:SmartBackSpace()
 	let char2 = matchstr(la, regex2)
 	if has_key(g:open_brackets, char1)
 		if has_key(g:close_brackets, char2)
-			let a = call(function('DeleteBetweenBraces'), [cl, cp, ca, comm])
-			return a
-			" return a."condition1"
+			let a = call(function('DeleteBetweenBraces'), [cl, cp-1, ca, comm])
+			" return a
+			return a."condition1"
 		else
 			let a = call(function('DeleteBetweenBraces'), [cl, cp-1, ca, comm])
 			return a
@@ -505,7 +505,7 @@ function! DeleteBetweenBraces(cl, cp, ca, comm)
 		let a = a.tmp
 		if (line =~ '^\s*['.a:comm.']\s*$') || (line =~ '^\s\+$')
 			let a = a.tmp
-			if line =~ '^\s'
+			if line =~ '^\s['.a:comm.']'
 				let a = a.tmp
 			endif
 		endif
