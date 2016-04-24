@@ -67,14 +67,14 @@ syntax enable
 let g:solarized_termcolors=16
 let g:solarized_contrast="high"
 let g:solarized_visibility="normal"
-set background=light
-colorscheme default
+set background=dark
+colorscheme solarized
 
 " Extra variables for toggling colorschemes and background:
 let g:colschemelist=['default', 'solarized', 'lucius'] " List of colorscheme I want to cycle through
 let g:mybg=['dark', 'light']                           " Background can be dark or light
-let g:currentcolscheme=0                               " Counter to keep track of which colorscheme to use fromt the list
-let g:currentbg=1                                      " Counter for toggling background (0 or 1)
+let g:currentcolscheme=1                               " Counter to keep track of which colorscheme to use fromt the list
+let g:currentbg=0                                      " Counter for toggling background (0 or 1)
 
 " General use interface settings:
 set number                                         " turn on line number
@@ -178,10 +178,10 @@ nnoremap S i<CR><ESC>^mwgk:silent! s/\v +$//<CR><BS>`w
 vnoremap . :normal .<CR>
 
 " Mapping for toggling background colour:
-nnoremap <silent> cob :call Togglebg()<CR>
+nnoremap <silent> cob :call <SID>Togglebg()<CR>
 
 " Mapping for toggling colorscheme (default or solarized):
-nnoremap <silent> col :call ToggleColScheme()<CR>
+nnoremap <silent> col :call <SID>ToggleColScheme()<CR>
 
 " Mapping for toggling search highlighting (only in normal mode):
 nnoremap <silent> <BS> :set hlsearch!<CR>
@@ -189,28 +189,15 @@ nnoremap <silent> <BS> :set hlsearch!<CR>
 " Mapping for toggling spell checking (only in normal mode):
 cnoremap <silent>  :set hlsearch!<CR>
 
+" Mapping for deleting blank lines between two lines of text
+nnoremap <expr> dd (getline('.') =~ '^\s*$') ? "i\<C-r>=SmartBackSpace()\<CR>\<ESC>" : "dd"
+inoremap <expr> <BS> pumvisible() ? neocomplete#smart_close_popup()."\<C-h>" : "\<C-R>=SmartBackSpace()\<CR>"
+
+" Mapping for checking what regex is being picked up
+nnoremap <F5> yi':let @/ = @"<CR>
+
 " If you want more key mapping ideas, see :h map-which-keys for a list of key
 " sequences not used by Vim.
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" My functions:
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" Function to toggle background colour:
-function! Togglebg()
-	:exec "set background=" . (g:mybg[g:currentbg])
-	let g:currentbg=-(g:currentbg-1)
-endfunction
-
-" Function to toggle colourscheme in the list:
-function! ToggleColScheme()
-	:exec "colorscheme" (g:colschemelist[g:currentcolscheme])
-	if g:currentcolscheme < (len(g:colschemelist) - 1)
-		let g:currentcolscheme=g:currentcolscheme+1
-	else
-		let g:currentcolscheme=0
-	endif
-endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Neocomplete settings:
@@ -252,7 +239,6 @@ inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 
 " <C-h>, <BS>: close popup and delete backward char.
 inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
-inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
 
 " Close popup by <Space>.
 "inoremap <expr><Space> pumvisible() ? "\<C-y>" : "\<Space>"
@@ -375,36 +361,30 @@ imap (<CR> <Plug>ISurround)
 imap {<CR> <Plug>ISurround}
 imap [<CR> <Plug>ISurround]
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" My functions:
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 " TODO: add a function to skip the closing braces
 
-function! GetOpen(comm) abort
-	let open = join(keys(g:open_brackets), '')
-	let tmp = split(a:comm, '\zs')
-	for x in tmp
-		let open = substitute(open, x, '', 'g')
-	endfor
-	let open = escape(open, "*\[")
-	return open
+" Function to toggle background colour:
+function! s:Togglebg()
+	:exec "set background=" . (g:mybg[g:currentbg])
+	let g:currentbg=-(g:currentbg-1)
 endfunction
 
-function! GetClose(comm) abort
-	let close = join(keys(g:close_brackets), '')
-	let tmp = split(a:comm, '\zs')
-	for x in tmp
-		let close = substitute(close, x, '', 'g')
-	endfor
-	let close = escape(close, "*\]")
-	return close
+" Function to toggle colourscheme in the list:
+function! s:ToggleColScheme()
+	:exec "colorscheme" (g:colschemelist[g:currentcolscheme])
+	if g:currentcolscheme < (len(g:colschemelist) - 1)
+		let g:currentcolscheme=g:currentcolscheme+1
+	else
+		let g:currentcolscheme=0
+	endif
 endfunction
 
-" Add a function so that the <BS> within an empty three-line-spanning braces are
-" put into a single line:
-" TODO: consider lines that are empty but commented
-" TODO: also look into tabbed lines - it messes up the C-U feature (gives off by
-" N error)
-" TODO: condition for deleting the lines until EOF/BOF (i.e. dG/dgg commands in
-" normal)
-function! s:SmartBackSpace()
+" Function that deletes any blank lines between lines of text
+function! SmartBackSpace()
 	let a = ''
 	let comm = GetComm()
 	let open = GetOpen(comm)
@@ -424,7 +404,6 @@ function! s:SmartBackSpace()
 		endif
 	endif
 	"Find the next line with non-blank chars before/after current line
-	" while !(!(match(lp, '^.*['.open.']\zs\s*$') < 0) || (lp =~ '\S$') || (lp =~ '%^'))
 	while lp =~ '\%^'
 		if lp =~ '^.*\zs['.open.']\ze\s*$'
 			break
@@ -442,9 +421,7 @@ function! s:SmartBackSpace()
 			break
 		endif
 	endwhile
-	echom cp
-	" while !(!(match(la, '^\s*['.close.'].*$') < 0) || (la =~ '\S$') || (la =~ '%$'))
-	while (cl+ca) < line('$')
+	while (cl+ca) <= line('$')
 		if la =~ '^\s*\zs['.close.']\ze.*$'
 			break
 		elseif la =~ '\zs\S\ze\s*$'
@@ -461,7 +438,6 @@ function! s:SmartBackSpace()
 			break
 		endif
 	endwhile
-	echom ca
 	"Delete the blank spaces in between the braces
 	let l = lp.la
 	let regex1 = '^.*\zs['.open.']\ze\s*$'
@@ -471,37 +447,24 @@ function! s:SmartBackSpace()
 	if has_key(g:open_brackets, char1)
 		if has_key(g:close_brackets, char2)
 			let a = call(function('DeleteBetweenBraces'), [cl, cp-1, ca, comm])
-			" return a
-			return a."condition1"
+			return a
 		else
 			let a = call(function('DeleteBetweenBraces'), [cl, cp-1, ca, comm])
 			return a
-			" return a."condition2"
 		endif
 	else
-		let a = call(function('DeleteBetweenBraces'), [cl, cp-2, ca, comm])
+		let a = call(function('DeleteBetweenBraces'), [cl, cp-3, ca, comm])
 		return a
-		" return a."condition3"
 	endif
-	" let a = call(function('DeleteBetweenBraces'), [cl, cp-2, ca, comm])
-	" return a
-	" return a."condition4"
-	" endif
-endfunction
-
-" Just a helping function to 'delete' a line
-function! DeleteLine()
-	return "\<C-u>"
 endfunction
 
 " Function to delete the blanklines between the innermost braces
 function! DeleteBetweenBraces(cl, cp, ca, comm)
 	let a = SetCursor(a:ca)
 	let x = a:cp+a:ca
-	let tmp = DeleteLine()
+	let tmp = "\<C-u>"
 	while x >= 0
 		let line = getline((a:cl+a:ca)-x)
-		" echom "current line:".line
 		let a = a.tmp
 		if (line =~ '^\s*['.a:comm.']\s*$') || (line =~ '^\s\+$')
 			let a = a.tmp
@@ -510,36 +473,52 @@ function! DeleteBetweenBraces(cl, cp, ca, comm)
 			endif
 		endif
 		let x = x-1
-		" echom "current value of a".a
 	endwhile
 	return a
 endfunction
 
-inoremap <BS> <C-R>=<SID>SmartBackSpace()<CR>
-
+" Function to set cursor at the position where you want to start deleting
 function! SetCursor(ca)
 	let t = ''
 	let c = a:ca
-	" let line = getline((a:cl+a:ca)-x)
 	while c > 0
 		let t = t."\<C-g>\<C-j>"
 		let c = c-1
 	endwhile
 	return t."\<ESC>I"
-	" return t."\<>"
 endfunction
 
-nnoremap <F5> yi':let @/ = @"<CR>
-
+" Function to get the possible comment characters for the current filetype
 function! GetComm()
 	let tmp = []
 	let tmp = add(tmp, matchstr(&commentstring, '\zs.*\ze%s'))
 	let x = split(matchstr(split(&comments, ','), 'm'), ':')
 	if !empty(split(matchstr(split(&comments, ','), 'm'), ':'))
-		" if match(x, tmp[0]) < 0
-			let tmp = add(tmp, split(matchstr(split(&comments, ','), 'm'), ':')[1])
-		" endif
+		let tmp = add(tmp, split(matchstr(split(&comments, ','), 'm'), ':')[1])
 	endif
 	let comm = join(tmp, '|')
 	return comm
 endfunction
+
+" Function to construct a string of opening brackets
+function! GetOpen(comm) abort
+	let open = join(keys(g:open_brackets), '')
+	let tmp = split(a:comm, '\zs')
+	for x in tmp
+		let open = substitute(open, x, '', 'g')
+	endfor
+	let open = escape(open, "*\[")
+	return open
+endfunction
+
+" Same as GetOpen(), but for closing brackets
+function! GetClose(comm) abort
+	let close = join(keys(g:close_brackets), '')
+	let tmp = split(a:comm, '\zs')
+	for x in tmp
+		let close = substitute(close, x, '', 'g')
+	endfor
+	let close = escape(close, "*\]")
+	return close
+endfunction
+
