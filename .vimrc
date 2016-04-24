@@ -377,6 +377,26 @@ imap [<CR> <Plug>ISurround]
 
 " TODO: add a function to skip the closing braces
 
+function! GetOpen(comm) abort
+	let open = join(keys(g:open_brackets), '')
+	let tmp = split(a:comm, '\zs')
+	for x in tmp
+		let open = substitute(open, x, '', 'g')
+	endfor
+	let open = escape(open, "*\[")
+	return open
+endfunction
+
+function! GetClose(comm) abort
+	let close = join(keys(g:close_brackets), '')
+	let tmp = split(a:comm, '\zs')
+	for x in tmp
+		let close = substitute(close, x, '', 'g')
+	endfor
+	let close = escape(close, "*\]")
+	return close
+endfunction
+
 " Add a function so that the <BS> within an empty three-line-spanning braces are
 " put into a single line:
 " TODO: consider lines that are empty but commented
@@ -386,8 +406,9 @@ imap [<CR> <Plug>ISurround]
 " normal)
 function! s:SmartBackSpace()
 	let a = ''
-	let open = escape(join(keys(g:open_brackets), ''), "'[")
-	let close = escape(join(keys(g:close_brackets), ''), "']")
+	let comm = GetComm()
+	let open = GetOpen(comm)
+	let close = GetClose(comm)
 	let cl = line('.')   " current line number
 	let cp = 0           " count previous lines
 	let ca = 0           " count lines after the current line
@@ -398,42 +419,74 @@ function! s:SmartBackSpace()
 	"If the current line contains a non-blank character before the cursor, use
 	"normal deletion
 	if !(gl =~ '^\s*$')
-		return "\<C-h>"
-	" elseif !(gl =~ '^$')
-	" 	return DeleteLine()
-	else
-		"Find the next line with non-blank chars before/after current line
-		while !(!(match(lp, '^.*['.open.']\zs\s*$') < 0) || (lp =~ '\S$') || (lp =~ '%^'))
+		if !(gl =~ '^\s*['.comm.']\s*$')
+			return "\<C-h>"
+		endif
+	endif
+	"Find the next line with non-blank chars before/after current line
+	" while !(!(match(lp, '^.*['.open.']\zs\s*$') < 0) || (lp =~ '\S$') || (lp =~ '%^'))
+	while lp =~ '\%^'
+		if lp =~ '^.*\zs['.open.']\ze\s*$'
+			break
+		elseif lp =~ '\zs\S\ze\s*$'
+			if lp =~ '^\s*['.comm.']\s*$'
+				let cp = cp+1
+				let lp = getline(cl-cp)
+			else
+				break
+			endif
+		elseif lp =~ '^\s*$'
 			let cp = cp+1
 			let lp = getline(cl-cp)
-		endwhile
-		echom cp
-		while !(!(match(la, '^\s*['.close.'].*$') < 0) || (la =~ '\S$') || (la =~ '%$'))
+		else
+			break
+		endif
+	endwhile
+	echom cp
+	" while !(!(match(la, '^\s*['.close.'].*$') < 0) || (la =~ '\S$') || (la =~ '%$'))
+	while (cl+ca) < line('$')
+		if la =~ '^\s*\zs['.close.']\ze.*$'
+			break
+		elseif la =~ '\zs\S\ze\s*$'
+			if la =~ '^\s*['.comm.']\s*$'
+				let ca = ca+1
+				let la = getline(cl+ca)
+			else
+				break
+			endif
+		elseif la =~ '^\s*$'
 			let ca = ca+1
 			let la = getline(cl+ca)
-		endwhile
-		echom ca
-		"Delete the blank spaces in between the braces
-		let l = lp.la
-		let regex1 = '^.*['.open.']\zs\s*$'
-		let regex2 = '^\s*\zs['.close.']\ze.*$'
-		let char1 = matchstr(lp, regex1)
-		let char2 = matchstr(la, regex2)
-		if has_key(g:open_brackets, char1)
-			if has_key(g:close_brackets, char2)
-				let a = call(function('DeleteBetweenBraces'), [cl, cp, ca])
-				return a
-			else
-				let a = call(function('DeleteBetweenBraces'), [cl, cp-1, ca])
-				return a
-			endif
 		else
-			let a = call(function('DeleteBetweenBraces'), [cl, cp-2, ca])
-			return a
+			break
 		endif
-		let a = call(function('DeleteBetweenBraces'), [cl, cp-2, ca])
+	endwhile
+	echom ca
+	"Delete the blank spaces in between the braces
+	let l = lp.la
+	let regex1 = '^.*\zs['.open.']\ze\s*$'
+	let regex2 = '^\s*\zs['.close.']\ze.*$'
+	let char1 = matchstr(lp, regex1)
+	let char2 = matchstr(la, regex2)
+	if has_key(g:open_brackets, char1)
+		if has_key(g:close_brackets, char2)
+			let a = call(function('DeleteBetweenBraces'), [cl, cp, ca, comm])
+			return a
+			" return a."condition1"
+		else
+			let a = call(function('DeleteBetweenBraces'), [cl, cp-1, ca, comm])
+			return a
+			" return a."condition2"
+		endif
+	else
+		let a = call(function('DeleteBetweenBraces'), [cl, cp-2, ca, comm])
 		return a
+		" return a."condition3"
 	endif
+	" let a = call(function('DeleteBetweenBraces'), [cl, cp-2, ca, comm])
+	" return a
+	" return a."condition4"
+	" endif
 endfunction
 
 " Just a helping function to 'delete' a line
@@ -442,13 +495,22 @@ function! DeleteLine()
 endfunction
 
 " Function to delete the blanklines between the innermost braces
-function! DeleteBetweenBraces(cl, cp, ca)
+function! DeleteBetweenBraces(cl, cp, ca, comm)
 	let a = SetCursor(a:ca)
 	let x = a:cp+a:ca
 	let tmp = DeleteLine()
 	while x >= 0
+		let line = getline((a:cl+a:ca)-x)
+		" echom "current line:".line
 		let a = a.tmp
+		if (line =~ '^\s*['.a:comm.']\s*$') || (line =~ '^\s\+$')
+			let a = a.tmp
+			if line =~ '^\s'
+				let a = a.tmp
+			endif
+		endif
 		let x = x-1
+		" echom "current value of a".a
 	endwhile
 	return a
 endfunction
@@ -458,13 +520,77 @@ inoremap <BS> <C-R>=<SID>SmartBackSpace()<CR>
 function! SetCursor(ca)
 	let t = ''
 	let c = a:ca
+	" let line = getline((a:cl+a:ca)-x)
 	while c > 0
 		let t = t."\<C-g>\<C-j>"
 		let c = c-1
 	endwhile
-	return t."\<Home>"
+	return t."\<ESC>I"
+	" return t."\<>"
 endfunction
 
+nnoremap <F5> yi':let @/ = @"<CR>
+
+function! GetComm()
+	let tmp = []
+	let tmp = add(tmp, matchstr(&commentstring, '\zs.*\ze%s'))
+	let x = split(matchstr(split(&comments, ','), 'm'), ':')
+	if !empty(split(matchstr(split(&comments, ','), 'm'), ':'))
+		" if match(x, tmp[0]) < 0
+			let tmp = add(tmp, split(matchstr(split(&comments, ','), 'm'), ':')[1])
+		" endif
+	endif
+	let comm = join(tmp, '|')
+	return comm
+endfunction
+
+
+
+
+
+				
+
+
+   
+
+
+
+
+
+
+"'^.*\zs[(]\ze\s*$'
+"'^\s*\zs[)]\ze.*$'
+"
+"
+"
+"
+"
+"
+"
+" while !(!(match(lp, '^.*['.open.']\zs\s*$') < 0) || (lp =~ '\S$') || (lp =~ '%^'))
+" while !(!(match(la, '^\s*['.close.'].*$') < 0) || (la =~ '\S$') || (la =~ '%$'))
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
 
 
 
