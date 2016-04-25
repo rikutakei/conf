@@ -196,6 +196,15 @@ inoremap <expr> <BS> pumvisible() ? neocomplete#smart_close_popup()."\<C-h>" : "
 " Mapping for checking what regex is being picked up
 nnoremap <F5> yi':let @/ = @"<CR>
 
+"Mappings to skip closing brackets when it is typed in insert mode
+inoremap ) <C-r>=<SID>SkipBracket(')')<CR>
+inoremap ] <C-r>=<SID>SkipBracket(']')<CR>
+inoremap } <C-r>=<SID>SkipBracket('}')<CR>
+inoremap > <C-r>=<SID>SkipBracket('>')<CR>
+" inoremap ` <C-r>=<SID>SkipBracket('`')<CR>
+" inoremap " <C-r>=<SID>SkipBracket('"')<CR>
+" inoremap <CR> <C-r>=<SID>SkipAllBracket()<CR>
+
 " If you want more key mapping ideas, see :h map-which-keys for a list of key
 " sequences not used by Vim.
 
@@ -228,11 +237,8 @@ let g:neocomplete#keyword_patterns['default'] = '\h[\w*[-_]\=]*'
 
 " Recommended key-mappings from the manual:
 
-" <CR>: close popup and save completion without returning.
-inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-function! s:my_cr_function()
-	return pumvisible() ? "\<C-y>" : "\<CR>"
-endfunction
+" <CR>: completion:
+inoremap <expr><CR> pumvisible() ? "\<C-y>" : "\<CR>"
 
 " <TAB>: completion.
 inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
@@ -352,8 +358,9 @@ endfunction
 imap ( <Plug>Isurround)
 imap { <Plug>Isurround}
 imap [ <Plug>Isurround]
-imap " <Plug>Isurround"
-imap ` <Plug>Isurround`
+imap < <Plug>Isurround>
+" imap " <Plug>Isurround"
+" imap ` <Plug>Isurround`
 
 " Span three lines when you press enter straight after making brackets:
 " (see Tim Pope's surround source code)
@@ -364,8 +371,6 @@ imap [<CR> <Plug>ISurround]
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " My functions:
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" TODO: add a function to skip the closing braces
 
 " Function to toggle background colour:
 function! s:Togglebg()
@@ -383,7 +388,40 @@ function! s:ToggleColScheme()
 	endif
 endfunction
 
+" Function to skip all of the closing brackets in a line:
+function! s:SkipAllBracket() abort
+	let close = GetClose('')
+	let close = substitute(close, ' ', '', 'g')
+	let cp = getpos('.')
+	if cp[2] > len(getline('.'))
+		return pumvisible() ? "\<C-y>" : "\<CR>"
+	endif
+	let str = getline('.')[cp[2]-1:]
+	while (match(str, '['.close.']') >= 0)
+		let cp[2] = cp[2]+match(str, '['.close.']')+1
+		call setpos('.', cp)
+		let str = str[cp[2]-1:]
+	endwhile
+	call setpos('.', cp)
+	return ""
+endfunction
+
+" Function to skip the specified closing bracket:
+function! s:SkipBracket(char) abort
+	let cp = getpos('.')
+	let str = getline('.')[cp[2]-1:]
+	if (match(str, a:char) >= 0)
+		let cp[2] = cp[2]+match(str, a:char)+1
+		call setpos('.', cp)
+	else
+		call setpos('.', cp)
+		return a:char
+	endif
+	return ""
+endfunction
+
 " Function that deletes any blank lines between lines of text
+" TODO: make this function smaller when I have time
 function! SmartBackSpace()
 	let a = ''
 	let comm = GetComm()
