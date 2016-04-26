@@ -61,6 +61,7 @@ call neobundle#end()
 
 " Enable the plugin that recognises filetype syntax:
 filetype plugin indent on
+set omnifunc=syntaxcomplete#Complete
 
 " Tweak colorscheme for Vim:
 syntax enable
@@ -109,7 +110,6 @@ set pumheight=5                                    " Set how many words are show
 set autoindent
 set linebreak                  " When wrapping lines, break at spaces and tabs only
 " set breakat=" ^I!@*-+;:,./?" " Default setting for breakat is good enough, but it's here if you want to change it
-set textwidth=80               " Set maximum characters per line in a file (only for comments)
 set tabstop=4                  " An indentation every four columns
 set softtabstop=4              " let backsapce delete indent
 set shiftwidth=4               " Use indents of four spaces
@@ -130,8 +130,11 @@ let g:tex_conceal = ""
 " Change the default leader key (\) to space key:
 let mapleader = " "
 
+" Mapping to toggle text wrapping:
+nnoremap <expr> gr &wrap == 1 ? ":set nowrap\<CR>" : ":set wrap\<CR>"
+
 " Mappings to (re)load .vimrc file:
-nnoremap    gr     :so ~/.vimrc<CR>
+" nnoremap    gr     :so ~/.vimrc<CR>
 nnoremap <Leader>r :so ~/.vimrc<CR>
 
 " Mappings to make moving around wrapped text easier:
