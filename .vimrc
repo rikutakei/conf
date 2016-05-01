@@ -40,19 +40,26 @@ call neobundle#begin(expand('~/.vim/bundle/'))
 NeoBundleFetch 'Shougo/neobundle.vim'
 
 "Manage other plugins (i.e. your custom plugins):
-NeoBundle 'godlygeek/tabular'
-NeoBundle 'junegunn/vim-easy-align'
-NeoBundle 'Shougo/context_filetype.vim' " TODO: checkout precious.vim and/or quickrun
-NeoBundle 'Shougo/neocomplete.vim'
-NeoBundle 'Shougo/neosnippet.vim' "TODO: R snippets?
-NeoBundle 'Shougo/neosnippet-snippets' "TODO: have a look at ulti snips
-NeoBundle 'Shougo/unite.vim' "TODO: look at how to actually work this
-NeoBundle 'Shougo/vimproc.vim', {'build': {'unix': g:make}} "TODO: try remap some commands
-NeoBundle 'tpope/vim-commentary'
-NeoBundle 'tpope/vim-surround'
-NeoBundle 'tpope/vim-repeat'
 NeoBundle 'altercation/vim-colors-solarized'
+NeoBundle 'ctrlpvim/ctrlp.vim'
+NeoBundle 'godlygeek/tabular'
 NeoBundle 'jonathanfilip/vim-lucius' "you'll have to symlink or move the lucius.vim file into ~/.vim/colors/ directory for this to work
+NeoBundle 'junegunn/vim-easy-align'
+NeoBundle 'mbbill/undotree'
+NeoBundle 'rking/ag.vim'
+NeoBundle 'scrooloose/nerdtree'
+NeoBundle 'scrooloose/syntastic'
+NeoBundle 'Shougo/context_filetype.vim'                     " TODO: checkout precious.vim and/or quickrun
+NeoBundle 'Shougo/neocomplete.vim'
+NeoBundle 'Shougo/neosnippet-snippets'
+NeoBundle 'Shougo/neosnippet.vim'
+NeoBundle 'Shougo/unite.vim'                                " TODO: look at how to actually work this
+NeoBundle 'Shougo/vimproc.vim', {'build': {'unix': g:make}} " TODO: try remap some commands
+NeoBundle 'tpope/vim-commentary'
+NeoBundle 'tpope/vim-fugitive'
+NeoBundle 'tpope/vim-repeat'
+NeoBundle 'tpope/vim-surround'
+
 
 call neobundle#end()
 
@@ -80,7 +87,7 @@ let g:currentbg=0                                      " Counter for toggling ba
 " General use interface settings:
 set number                                         " turn on line number
 set incsearch                                      " Turn on incremental search
-set hlsearch                                       " Turn on search highlighting
+set nohlsearch                                     " Turn on search highlighting
 set smartcase                                      " Turn on smart case
 set showmatch                                      " Show matching brackets/paranthese
 set wildmenu                                       " Show list of matches
@@ -233,10 +240,8 @@ if !exists('g:neocomplete#keyword_patterns')
 endif
 
 "Define the pattern to store/match for auto-completion (the default setting is
-"'\h\w*', which mean start of the word to the end of the word).
-"'\h[\w*[-_]\=]*' means from the start of a word to the end of a word that
-"contains none or one - or _ characters:
-let g:neocomplete#keyword_patterns['default'] = '\h[\w*[-_]\=]*'
+"'\h\w*')
+let g:neocomplete#keyword_patterns['default'] = '\h\w*-\w*'
 
 " Recommended key-mappings from the manual:
 
@@ -370,6 +375,58 @@ imap < <Plug>Isurround>
 imap (<CR> <Plug>ISurround)
 imap {<CR> <Plug>ISurround}
 imap [<CR> <Plug>ISurround]
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ag.vim and ctrlp.vim settings:
+
+if executable('ag')
+	" Use ag over grep
+	set grepprg=ag\ --nogroup\ --nocolor
+
+	let g:ctrlp_map='<C-p>'
+	let g:ctrlp_cmd='CtrlPMixed'
+	let g:ctrlp_by_filename=1 " Default search for filename
+	let g:ctrlp_match_window = 'bottom,order:ttb,min:1,max:4,results:4' " Settings for results window
+	let g:ctrlp_show_hidden=0 " Scan for dot files and dot directories
+	let g:ctrlp_open_multiple_files = '1hjr' " Settings for opening selected files
+
+	let g:ctrlp_use_caching=0
+	" Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+	let g:ctrlp_user_command = ['ag %s -i --nocolor --nogroup --hidden
+				\ --ignore .git
+				\ --ignore .svn
+				\ --ignore .hg
+				\ -g ""']
+	" let g:ctrlp_user_command += ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+	let g:ctrlp_custom_ignore = {
+				\ 'dir':  '\v[\/]\.(git|hg|svn)$',
+				\ 'file': '\v\.(exe|so|dll)$',
+				\ }
+endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" NERDTree settings:
+
+" Open/close NERDTree:
+nnoremap <C-e> :NERDTreeToggle<CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Syntastic settings:
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Undotree settings:
+
+nnoremap <C-u> :UndotreeToggle<CR>
+
+if has("persistent_undo")
+	set undodir=~/.undodir/
+	set undofile
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " My functions:
