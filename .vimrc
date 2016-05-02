@@ -44,7 +44,8 @@ NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'altercation/vim-colors-solarized'
 NeoBundle 'ctrlpvim/ctrlp.vim'
 NeoBundle 'godlygeek/tabular'
-NeoBundle 'jonathanfilip/vim-lucius' " you'll have to symlink or move the lucius.vim file into ~/.vim/colors/ directory for this to work
+NeoBundle 'jonathanfilip/vim-lucius' "you'll have to symlink or move the lucius.vim file into ~/.vim/colors/ directory for this to work
+NeoBundle 'jpalardy/vim-slime'
 NeoBundle 'junegunn/vim-easy-align'
 NeoBundle 'mbbill/undotree'
 NeoBundle 'rking/ag.vim'             " You'll have to install silversearcher-ag from command line
@@ -411,7 +412,10 @@ endif
 " Open/close NERDTree:
 nnoremap <C-e> :NERDTreeToggle<CR>
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Show dot files by default (Toggle by pressing I in the menu):
+let g:NERDTreeShowHidden=1
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Syntastic settings:
 
 let g:syntastic_always_populate_loc_list = 1
@@ -428,6 +432,26 @@ if has("persistent_undo")
 	set undodir=~/.undodir/
 	set undofile
 endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Vim-slime settings:
+
+" Make it compatible with tmux:
+let g:slime_target="tmux"
+let g:slime_default_config={"socket_name" : "default", "target_pane" : ":1.1"}
+
+" Options to make it send lines to different panes:
+let g:slime_vars={
+			\"up":    {"socket_name" : "default", "target_pane" : "0"},
+			\"down":  {"socket_name" : "default", "target_pane" : "1"},
+			\"right": {"socket_name" : "default", "target_pane" : "2"},
+			\"left":  {"socket_name" : "default", "target_pane" : "1"}
+			\}
+
+" Mappings:
+xmap <C-c><C-c> <Plug>SlimeConfig<Plug>SlimeRegionSend
+nmap <expr> <C-c><C-c> <SID>TmuxSend(slime_vars["down"], getline('.')."\r")."<CR>"
+nmap <expr> <C-c><C-r> <SID>TmuxSend(slime_vars["right"], getline('.')."\r")."<CR>"
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " My functions:
