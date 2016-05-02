@@ -40,13 +40,14 @@ call neobundle#begin(expand('~/.vim/bundle/'))
 NeoBundleFetch 'Shougo/neobundle.vim'
 
 "Manage other plugins (i.e. your custom plugins):
+NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'altercation/vim-colors-solarized'
 NeoBundle 'ctrlpvim/ctrlp.vim'
 NeoBundle 'godlygeek/tabular'
-NeoBundle 'jonathanfilip/vim-lucius' "you'll have to symlink or move the lucius.vim file into ~/.vim/colors/ directory for this to work
+NeoBundle 'jonathanfilip/vim-lucius' " you'll have to symlink or move the lucius.vim file into ~/.vim/colors/ directory for this to work
 NeoBundle 'junegunn/vim-easy-align'
 NeoBundle 'mbbill/undotree'
-NeoBundle 'rking/ag.vim'
+NeoBundle 'rking/ag.vim'             " You'll have to install silversearcher-ag from command line
 NeoBundle 'scrooloose/nerdtree'
 NeoBundle 'scrooloose/syntastic'
 NeoBundle 'Shougo/context_filetype.vim'                     " TODO: checkout precious.vim and/or quickrun
