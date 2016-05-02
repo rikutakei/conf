@@ -47,6 +47,7 @@ NeoBundle 'godlygeek/tabular'
 NeoBundle 'jonathanfilip/vim-lucius' "you'll have to symlink or move the lucius.vim file into ~/.vim/colors/ directory for this to work
 NeoBundle 'jpalardy/vim-slime'
 NeoBundle 'junegunn/vim-easy-align'
+NeoBundle 'majutsushi/tagbar'
 NeoBundle 'mbbill/undotree'
 NeoBundle 'rking/ag.vim'             " You'll have to install silversearcher-ag from command line
 NeoBundle 'scrooloose/nerdtree'
@@ -61,6 +62,8 @@ NeoBundle 'tpope/vim-commentary'
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-repeat'
 NeoBundle 'tpope/vim-surround'
+NeoBundle 'xolox/vim-easytags'
+NeoBundle 'xolox/vim-misc'
 
 
 call neobundle#end()
@@ -454,6 +457,12 @@ nmap <expr> <C-c><C-c> <SID>TmuxSend(slime_vars["down"], getline('.')."\r")."<CR
 nmap <expr> <C-c><C-r> <SID>TmuxSend(slime_vars["right"], getline('.')."\r")."<CR>"
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" tagbar settings:
+
+" Mapping to toggle tagbar:
+nnoremap <C-g><C-t> :TagbarToggle<CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " My functions:
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
