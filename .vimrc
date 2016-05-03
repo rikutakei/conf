@@ -62,7 +62,7 @@ NeoBundle 'Shougo/neoyank.vim'
 NeoBundle 'Shougo/unite-outline'
 NeoBundle 'Shougo/unite.vim'         " You may have to update it to the latest (possibly unstable) version of Vim to stop this freezing your vim
 NeoBundle 'Shougo/vimproc.vim', {'build': {'unix': g:make}}
-NeoBundle 'termoshtt/unite-bibtex'   " You need to install pybtex for this to work
+NeoBundle 'termoshtt/unite-bibtex'   " You need to install pybtex from the command line for this to work
 NeoBundle 'tpope/vim-commentary'
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-repeat'
@@ -72,7 +72,6 @@ NeoBundle 'tsukkee/unite-tag'
 NeoBundle 'ujihisa/unite-colorscheme'
 NeoBundle 'xolox/vim-easytags'       " You need to install exuberant-ctags
 NeoBundle 'xolox/vim-misc'
-
 
 call neobundle#end()
 
@@ -96,43 +95,43 @@ let g:mybg=['dark', 'light'] " Background can be dark or light
 let g:currentbg=0            " Counter for toggling background (0 or 1)
 
 " General use interface settings:
-set number                                         " turn on line number
-set incsearch                                      " Turn on incremental search
-set nohlsearch                                     " Turn on search highlighting
-set smartcase                                      " Turn on smart case
-set showmatch                                      " Show matching brackets/paranthese
-set wildmenu                                       " Show list of matches
-set wildmode=full
-set scrolloff=8                                    " Minimum lines to keep above/below the line with cursor
-set list                                           " Display unprintable characters
+set backspace=indent,eol,start " Allow backspace from where you pressed insert
+set history=1000               " Set the max number of history to remember
+set incsearch                  " Turn on incremental search
+set laststatus=2               " Always have statusline
+set list                       " Display unprintable characters
 set listchars=tab:›\ ,trail:•,extends:❯,precedes:❮ " Use these characters for unprintable characters
-set backspace=indent,eol,start                     " Allow backspace from where you pressed insert
-set visualbell t_vb=                               " Remove visual and/or sound notification for errors
-set showmode                                       " Display which mode you are in
-set virtualedit=block                              " Allow you to move cursor to position with no characters (e.g past eol)
-                                                   " set gdefault                                     " If you want to make the g flag default for substitution, uncomment this line
-set splitbelow                                     " Horizontal split will split the window below
-set splitright                                     " Vertical split will split the window to the right
-set ruler                                          " Display the whereabouts you are in the file
-set history=1000                                   " Set the max number of history to remember
-set matchtime=3                                    " Highlight the matching paranthesis for n/10 seconds
-set laststatus=2                                   " Always have statusline
-set showbreak=↪\                                   " Use this symbol to show where the line is wrapped
-set nowrap                                         " No text wrapping by default
-set notimeout                                      " Don't time out for key codes and/or mappings
-set ttimeout                                       " Together with the line above, this will set it to time out for key codes, but not mappings
-set ttimeoutlen=10                                 " Set time out length to 10 milliseconds
-set pumheight=5                                    " Set how many words are shown in the popup menu for any completion
+set matchtime=3                " Highlight the matching paranthesis for n/10 seconds
+set nohlsearch                 " Turn on search highlighting
+set notimeout                  " Don't time out for key codes and/or mappings
+set nowrap                     " No text wrapping by default
+set number                     " turn on line number
+set pumheight=5                " Set how many words are shown in the popup menu for any completion
+set ruler                      " Display the whereabouts you are in the file
+set scrolloff=8                " Minimum lines to keep above/below the line with cursor
+set showbreak=↪\               " Use this symbol to show where the line is wrapped
+set showmatch                  " Show matching brackets/paranthese
+set showmode                   " Display which mode you are in
+set smartcase                  " Turn on smart case
+set splitbelow                 " Horizontal split will split the window below
+set splitright                 " Vertical split will split the window to the right
+set ttimeout                   " Together with the line above, this will set it to time out for key codes, but not mappings
+set ttimeoutlen=10             " Set time out length to 10 milliseconds
+set virtualedit=block          " Allow you to move cursor to position with no characters (e.g past eol)
+                               " set gdefault                                     " If you want to make the g flag default for substitution, uncomment this line
+set visualbell t_vb=           " Remove visual and/or sound notification for errors
+set wildmenu                   " Show list of matches
+set wildmode=full
 
 " General text/comment format settings:
 set autoindent
-set linebreak                  " When wrapping lines, break at spaces and tabs only
 " set breakat=" ^I!@*-+;:,./?" " Default setting for breakat is good enough, but it's here if you want to change it
-set tabstop=4                  " An indentation every four columns
-set softtabstop=4              " let backsapce delete indent
-set shiftwidth=4               " Use indents of four spaces
-set nojoinspaces               " prevents inserting two spaces after punctuation on a join (J)
 set formatoptions=croq1j       " Set default text and/or comment format options (see :h fo-table for explanation of each flag):
+set linebreak                  " When wrapping lines, break at spaces and tabs only
+set nojoinspaces               " prevents inserting two spaces after punctuation on a join (J)
+set shiftwidth=4               " Use indents of four spaces
+set softtabstop=4              " let backsapce delete indent
+set tabstop=4                  " An indentation every four columns
 
 " Spell checking and dictionary:
 set dictionary=/usr/share/dict/words       " Set the dictionary directory
@@ -142,6 +141,7 @@ set spellfile=~/.vim/custom-dictionary.add " Set the file to put your custom wor
 " LaTeX:
 let g:tex_conceal = ""
 
+" Use Ag as default grep method:
 if executable('ag')
 	" Use ag over grep
 	set grepprg=ag\ --nogroup\ --nocolor
@@ -157,7 +157,6 @@ let mapleader = " "
 nnoremap <expr> gr &wrap == 1 ? ":set nowrap\<CR>" : ":set wrap\<CR>"
 
 " Mappings to (re)load .vimrc file:
-" nnoremap    gr     :so ~/.vimrc<CR>
 nnoremap <Leader>r :so ~/.vimrc<CR>
 
 " Mappings to make moving around wrapped text easier:
@@ -203,12 +202,10 @@ vnoremap f :fold<CR>
 " Mapping for toggling background colour:
 nnoremap <silent> cob :call <SID>Togglebg()<CR>
 
-" Mapping for toggling colorscheme (default or solarized):
-nnoremap <silent> col :call <SID>ToggleColScheme()<CR>
-
 " Mapping for toggling search highlighting (only in normal mode):
 nnoremap <silent> <BS> :set hlsearch!<CR>
 
+" TODO: checkout spell checking in vim
 " Mapping for toggling spell checking (only in normal mode):
 " cnoremap <silent>  :set hlsearch!<CR>
 
@@ -225,12 +222,31 @@ inoremap ) <C-r>=<SID>SkipBracket(')')<CR>
 inoremap ] <C-r>=<SID>SkipBracket(']')<CR>
 inoremap } <C-r>=<SID>SkipBracket('}')<CR>
 inoremap > <C-r>=<SID>SkipBracket('>')<CR>
-" inoremap ` <C-r>=<SID>SkipBracket('`')<CR>
-" inoremap " <C-r>=<SID>SkipBracket('"')<CR>
-" inoremap <CR> <C-r>=<SID>SkipAllBracket()<CR>
 
 " If you want more key mapping ideas, see :h map-which-keys for a list of key
 " sequences not used by Vim.
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Unite settings:
+
+let g:unite_source_history_yank_enable=1
+call unite#filters#matcher_default#use(['matcher_fuzzy'])
+call unite#custom#profile('default', 'context', {
+			\'winheight' : 10,
+			\})
+
+" Set the directory of the reference file:
+let g:unite_bibtex_bib_files=["~/Documents/References/BibTeX/MSc.bib"]
+
+"Mappings for unite:
+nnoremap <C-p>  :<C-u>Unite -buffer-name=files       -keep-focus   -no-quit file_rec/async:! buffer<cr>
+nnoremap <C-m>  :<C-u>Unite -buffer-name=mru         file_mru<cr>
+nnoremap <C-g>h :<C-u>Unite -buffer-name=help        -start-insert help:!<cr>
+nnoremap <C-g>t :<C-u>Unite -buffer-name=outline     outline:!<cr>
+nnoremap <C-y>  :<C-u>Unite -buffer-name=yank        history/yank:!<cr>
+nnoremap <C-g>b :<C-u>Unite -buffer-name=buffer      buffer:-<cr>
+nnoremap <C-g>r :<C-u>Unite -buffer-name=reference   -start-insert bibtex<cr>
+nnoremap <C-g>c :<C-u>Unite -buffer-name=colorscheme colorscheme<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Neocomplete settings:
@@ -267,9 +283,6 @@ inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 
 " <C-h>, <BS>: close popup and delete backward char.
 inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
-
-" Close popup by <Space>.
-"inoremap <expr><Space> pumvisible() ? "\<C-y>" : "\<Space>"
 
 " Enable omni completion.
 autocmd FileType css           setlocal omnifunc=csscomplete#CompleteCSS
@@ -380,8 +393,6 @@ imap ( <Plug>Isurround)
 imap { <Plug>Isurround}
 imap [ <Plug>Isurround]
 imap < <Plug>Isurround>
-" imap " <Plug>Isurround"
-" imap ` <Plug>Isurround`
 
 " Span three lines when you press enter straight after making brackets:
 " (see Tim Pope's surround source code)
@@ -401,6 +412,7 @@ let g:NERDTreeShowHidden=1
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Syntastic settings:
 
+" Show the sytax errors in quick fix list when file is opened:
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
@@ -409,8 +421,10 @@ let g:syntastic_check_on_wq = 0
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Undotree settings:
 
+" Show/close UndoTree:
 nnoremap <C-u> :UndotreeToggle<CR>
 
+" Set persistent undo (have to make .undodir in your home directory):
 if has("persistent_undo")
 	set undodir=~/.undodir/
 	set undofile
@@ -442,36 +456,6 @@ nmap <expr> <C-c><C-r> <SID>TmuxSend(slime_vars["right"], getline('.')."\r")."<C
 " Mapping to toggle tagbar:
 nnoremap <C-g><C-t> :TagbarToggle<CR>
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Unite settings:
-
-let g:unite_source_history_yank_enable=1
-call unite#filters#matcher_default#use(['matcher_fuzzy'])
-call unite#custom#profile('default', 'context', {
-			\'winheight' : 10,
-			\})
-
-" Set the directory of the reference file:
-let g:unite_bibtex_bib_files=["~/Documents/References/BibTeX/MSc.bib"]
-
-" Use ag (the silver searcher)
-let g:unite_source_grep_command = 'ag'
-let g:unite_source_grep_default_opts =
-			\ '-i --line-numbers --nocolor --nogroup -S --hidden --ignore ' .
-			\ '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'''
-let g:unite_source_grep_recursive_opt = ''
-
-"Mappings for unite:
-nnoremap <C-p>  :<C-u>Unite -buffer-name=files -keep-focus -no-quit file_rec/async:! buffer<cr>
-nnoremap <C-m>  :<C-u>Unite -buffer-name=mru file_mru<cr>
-nnoremap <C-g>h :<C-u>Unite -start-insert -buffer-name=help help:!<cr>
-nnoremap <C-g>t :<C-u>Unite -buffer-name=outline outline:!<cr>
-nnoremap <C-y>  :<C-u>Unite -buffer-name=yank history/yank:!<cr>
-nnoremap <C-g>b :<C-u>Unite -buffer-name=buffer buffer:-<cr>
-nnoremap <C-g>g :<C-u>Unite -buffer-name=grep grep:$HOME/Documents/<cr>
-nnoremap <C-g>r :<C-u>Unite -buffer-name=reference bibtex<cr>
-nnoremap <C-g>c :<C-u>Unite -buffer-name=colorscheme colorscheme<cr>
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " My functions:
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -487,7 +471,7 @@ function! s:SkipAllBracket() abort
 	let close = GetClose('')
 	let close = substitute(close, ' ', '', 'g')
 	let cp = getpos('.')
-	if cp[2] > len(getline('.'))
+	if cp[2] > len(getline('.')
 		return pumvisible() ? "\<C-y>" : "\<CR>"
 	endif
 	let str = getline('.')[cp[2]-1:]
