@@ -44,7 +44,7 @@ NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'altercation/vim-colors-solarized'
 NeoBundle 'ctrlpvim/ctrlp.vim'
 NeoBundle 'godlygeek/tabular'
-NeoBundle 'jonathanfilip/vim-lucius' "you'll have to symlink or move the lucius.vim file into ~/.vim/colors/ directory for this to work
+NeoBundle 'jonathanfilip/vim-lucius' " you'll have to symlink or move the lucius.vim file into ~/.vim/colors/ directory for this to work
 NeoBundle 'jpalardy/vim-slime'
 NeoBundle 'junegunn/vim-easy-align'
 NeoBundle 'majutsushi/tagbar'
@@ -52,17 +52,25 @@ NeoBundle 'mbbill/undotree'
 NeoBundle 'rking/ag.vim'             " You'll have to install silversearcher-ag from command line
 NeoBundle 'scrooloose/nerdtree'
 NeoBundle 'scrooloose/syntastic'
-NeoBundle 'Shougo/context_filetype.vim'                     " TODO: checkout precious.vim and/or quickrun
+NeoBundle 'Shougo/context_filetype.vim'
 NeoBundle 'Shougo/neocomplete.vim'
+NeoBundle 'Shougo/neoinclude.vim'
+NeoBundle 'Shougo/neomru.vim'
 NeoBundle 'Shougo/neosnippet-snippets'
 NeoBundle 'Shougo/neosnippet.vim'
-NeoBundle 'Shougo/unite.vim'                                " TODO: look at how to actually work this
-NeoBundle 'Shougo/vimproc.vim', {'build': {'unix': g:make}} " TODO: try remap some commands
+NeoBundle 'Shougo/neoyank.vim'
+NeoBundle 'Shougo/unite-outline'
+NeoBundle 'Shougo/unite.vim'         " You may have to update it to the latest (possibly unstable) version of Vim to stop this freezing your vim
+NeoBundle 'Shougo/vimproc.vim', {'build': {'unix': g:make}}
+NeoBundle 'termoshtt/unite-bibtex'   " You need to install pybtex for this to work
 NeoBundle 'tpope/vim-commentary'
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-repeat'
 NeoBundle 'tpope/vim-surround'
-NeoBundle 'xolox/vim-easytags'
+NeoBundle 'tsukkee/unite-help'
+NeoBundle 'tsukkee/unite-tag'
+NeoBundle 'ujihisa/unite-colorscheme'
+NeoBundle 'xolox/vim-easytags'       " You need to install exuberant-ctags
 NeoBundle 'xolox/vim-misc'
 
 
@@ -84,10 +92,8 @@ set background=dark
 colorscheme solarized
 
 " Extra variables for toggling colorschemes and background:
-let g:colschemelist=['default', 'solarized', 'lucius'] " List of colorscheme I want to cycle through
-let g:mybg=['dark', 'light']                           " Background can be dark or light
-let g:currentcolscheme=1                               " Counter to keep track of which colorscheme to use fromt the list
-let g:currentbg=0                                      " Counter for toggling background (0 or 1)
+let g:mybg=['dark', 'light'] " Background can be dark or light
+let g:currentbg=0            " Counter for toggling background (0 or 1)
 
 " General use interface settings:
 set number                                         " turn on line number
@@ -136,6 +142,11 @@ set spellfile=~/.vim/custom-dictionary.add " Set the file to put your custom wor
 " LaTeX:
 let g:tex_conceal = ""
 
+if executable('ag')
+	" Use ag over grep
+	set grepprg=ag\ --nogroup\ --nocolor
+endif
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Key Mappings:
 
@@ -166,12 +177,6 @@ nnoremap <silent>  <C-w>-   <C-w>s
 nnoremap <silent>  <C-w>\|  <C-w>v
 nnoremap <silent> <Leader>= <C-w>=
 
-" Mappings for resizing windows:
-" nnoremap <silent> <C-J> :exe "resize -5" <CR>
-" nnoremap <silent> <C-K> :exe "resize +5" <CR>
-" nnoremap <silent> <C-H> :exe "vertical resize -5" <CR>
-" nnoremap <silent> <C-L> :exe "vertical resize +5" <CR>
-
 " Mappings for system clipboard yank:
 nnoremap <Leader>y "+y
 vnoremap <Leader>y "+y
@@ -192,6 +197,9 @@ nnoremap S i<CR><ESC>^mwgk:silent! s/\v +$//<CR><BS>`w
 " Mapping for using dot command on the selection:
 vnoremap . :normal .<CR>
 
+" Mapping for creating folds:
+vnoremap f :fold<CR>
+
 " Mapping for toggling background colour:
 nnoremap <silent> cob :call <SID>Togglebg()<CR>
 
@@ -202,13 +210,14 @@ nnoremap <silent> col :call <SID>ToggleColScheme()<CR>
 nnoremap <silent> <BS> :set hlsearch!<CR>
 
 " Mapping for toggling spell checking (only in normal mode):
-cnoremap <silent>  :set hlsearch!<CR>
+" cnoremap <silent>  :set hlsearch!<CR>
 
 " Mapping for deleting blank lines between two lines of text
 nnoremap <expr> dd (getline('.') =~ '^\s*$') ? "i\<C-r>=SmartBackSpace()\<CR>\<ESC>" : "dd"
 inoremap <expr> <BS> pumvisible() ? neocomplete#smart_close_popup()."\<C-h>" : "\<C-R>=SmartBackSpace()\<CR>"
 
-" Mapping for checking what regex is being picked up
+" Mapping for checking what regex is being picked up (only in between single
+" quotation marks):
 nnoremap <F5> yi':let @/ = @"<CR>
 
 "Mappings to skip closing brackets when it is typed in insert mode
@@ -281,7 +290,6 @@ endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Neosnippet settings:
-
 
 " Plugin key-mappings.
 imap <C-k> <Plug>(neosnippet_expand_or_jump)
@@ -382,34 +390,6 @@ imap {<CR> <Plug>ISurround}
 imap [<CR> <Plug>ISurround]
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" ag.vim and ctrlp.vim settings:
-
-if executable('ag')
-	" Use ag over grep
-	set grepprg=ag\ --nogroup\ --nocolor
-
-	let g:ctrlp_map='<C-p>'
-	let g:ctrlp_cmd='CtrlPMixed'
-	let g:ctrlp_by_filename=1 " Default search for filename
-	let g:ctrlp_match_window = 'bottom,order:ttb,min:1,max:4,results:4' " Settings for results window
-	let g:ctrlp_show_hidden=0 " Scan for dot files and dot directories
-	let g:ctrlp_open_multiple_files = '1hjr' " Settings for opening selected files
-
-	let g:ctrlp_use_caching=0
-	" Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-	let g:ctrlp_user_command = ['ag %s -i --nocolor --nogroup --hidden
-				\ --ignore .git
-				\ --ignore .svn
-				\ --ignore .hg
-				\ -g ""']
-	" let g:ctrlp_user_command += ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
-	let g:ctrlp_custom_ignore = {
-				\ 'dir':  '\v[\/]\.(git|hg|svn)$',
-				\ 'file': '\v\.(exe|so|dll)$',
-				\ }
-endif
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " NERDTree settings:
 
 " Open/close NERDTree:
@@ -462,6 +442,36 @@ nmap <expr> <C-c><C-r> <SID>TmuxSend(slime_vars["right"], getline('.')."\r")."<C
 " Mapping to toggle tagbar:
 nnoremap <C-g><C-t> :TagbarToggle<CR>
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Unite settings:
+
+let g:unite_source_history_yank_enable=1
+call unite#filters#matcher_default#use(['matcher_fuzzy'])
+call unite#custom#profile('default', 'context', {
+			\'winheight' : 10,
+			\})
+
+" Set the directory of the reference file:
+let g:unite_bibtex_bib_files=["~/Documents/References/BibTeX/MSc.bib"]
+
+" Use ag (the silver searcher)
+let g:unite_source_grep_command = 'ag'
+let g:unite_source_grep_default_opts =
+			\ '-i --line-numbers --nocolor --nogroup -S --hidden --ignore ' .
+			\ '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'''
+let g:unite_source_grep_recursive_opt = ''
+
+"Mappings for unite:
+nnoremap <C-p>  :<C-u>Unite -buffer-name=files -keep-focus -no-quit file_rec/async:! buffer<cr>
+nnoremap <C-m>  :<C-u>Unite -buffer-name=mru file_mru<cr>
+nnoremap <C-g>h :<C-u>Unite -start-insert -buffer-name=help help:!<cr>
+nnoremap <C-g>t :<C-u>Unite -buffer-name=outline outline:!<cr>
+nnoremap <C-y>  :<C-u>Unite -buffer-name=yank history/yank:!<cr>
+nnoremap <C-g>b :<C-u>Unite -buffer-name=buffer buffer:-<cr>
+nnoremap <C-g>g :<C-u>Unite -buffer-name=grep grep:$HOME/Documents/<cr>
+nnoremap <C-g>r :<C-u>Unite -buffer-name=reference bibtex<cr>
+nnoremap <C-g>c :<C-u>Unite -buffer-name=colorscheme colorscheme<cr>
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " My functions:
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -470,16 +480,6 @@ nnoremap <C-g><C-t> :TagbarToggle<CR>
 function! s:Togglebg()
 	:exec "set background=" . (g:mybg[g:currentbg])
 	let g:currentbg=-(g:currentbg-1)
-endfunction
-
-" Function to toggle colourscheme in the list:
-function! s:ToggleColScheme()
-	:exec "colorscheme" (g:colschemelist[g:currentcolscheme])
-	if g:currentcolscheme < (len(g:colschemelist) - 1)
-		let g:currentcolscheme=g:currentcolscheme+1
-	else
-		let g:currentcolscheme=0
-	endif
 endfunction
 
 " Function to skip all of the closing brackets in a line:
