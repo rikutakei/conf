@@ -229,6 +229,9 @@ inoremap > <C-r>=<SID>SkipBracket('>')<CR>
 " inoremap " <C-r>=<SID>SkipBracket('"')<CR>
 " inoremap <CR> <C-r>=<SID>SkipAllBracket()<CR>
 
+"Mapings to quickly make the document:
+nnoremap <Leader>m :make<CR>
+
 " If you want more key mapping ideas, see :h map-which-keys for a list of key
 " sequences not used by Vim.
 
