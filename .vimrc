@@ -450,8 +450,8 @@ let g:slime_vars={
 
 " Mappings:
 xmap <C-c><C-c> <Plug>SlimeConfig<Plug>SlimeRegionSend
-nmap <expr> <C-c><C-c> <SID>TmuxSend(slime_vars["down"], getline('.')."\r")."<CR>"
-nmap <expr> <C-c><C-r> <SID>TmuxSend(slime_vars["right"], getline('.')."\r")."<CR>"
+nmap <expr> <C-c><C-c> <SID>TmuxSend(slime_vars["down"], getline('.')."\r")
+nmap <expr> <C-c><C-r> <SID>TmuxSend(slime_vars["right"], getline('.')."\r")
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " tagbar settings:
@@ -641,3 +641,31 @@ function! GetClose(comm) abort
 	return close
 endfunction
 
+function! s:TmuxSend(config, text)
+  let l:prefix = "tmux -L " . shellescape(a:config["socket_name"])
+  " use STDIN unless configured to use a file
+  if !exists("g:slime_paste_file")
+    call system(l:prefix . " load-buffer -", a:text)
+  else
+    call s:WritePasteFile(a:text)
+    call system(l:prefix . " load-buffer " . g:slime_paste_file)
+  end
+  call system(l:prefix . " paste-buffer -d -t " . shellescape(a:config["target_pane"]))
+endfunction
+
+function! s:TmuxPaneNames(A,L,P)
+  let format = '#{pane_id} #{session_name}:#{window_index}.#{pane_index} #{window_name}#{?window_active, (active),}'
+  return system("tmux -L " . shellescape(b:slime_config['socket_name']) . " list-panes -a -F " . shellescape(format))
+endfunction
+
+function! s:TmuxConfig() abort
+  if !exists("b:slime_config")
+    let b:slime_config = {"socket_name": "default", "target_pane": ":"}
+  end
+
+  let b:slime_config["socket_name"] = input("tmux socket name: ", b:slime_config["socket_name"])
+  let b:slime_config["target_pane"] = input("tmux target pane: ", b:slime_config["target_pane"], "custom,<SNR>" . s:SID() . "_TmuxPaneNames")
+  if b:slime_config["target_pane"] =~ '\s\+'
+    let b:slime_config["target_pane"] = split(b:slime_config["target_pane"])[0]
+  endif
+endfunction
