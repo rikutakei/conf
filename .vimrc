@@ -243,7 +243,7 @@ let g:unite_bibtex_bib_files=["~/Documents/References/BibTeX/MSc.bib"]
 
 "Mappings for unite:
 nnoremap <C-p>  :<C-u>Unite -buffer-name=files       -keep-focus   -no-quit file_rec/async:! buffer<cr>
-nnoremap <C-m>  :<C-u>Unite -buffer-name=mru         file_mru<cr>
+nnoremap <C-g>m :<C-u>Unite -buffer-name=mru         file_mru<cr>
 nnoremap <C-g>h :<C-u>Unite -buffer-name=help        -start-insert help:!<cr>
 nnoremap <C-g>t :<C-u>Unite -buffer-name=outline     outline:!<cr>
 nnoremap <C-y>  :<C-u>Unite -buffer-name=yank        history/yank:!<cr>
