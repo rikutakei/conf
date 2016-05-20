@@ -344,6 +344,9 @@ vmap <C-a> <Plug>(EasyAlign)<C-f>g/
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Tabular settings:
 
+" Mapping to align symbols that aren't covered in easy-align:
+vmap <Tab>% :Tabularize /%<CR>
+
 " Automatically tabularize text in insert mode when | is encountered:
 " TODO: need to put these into language specific files for loading
 inoremap <Bar> <Bar><Esc>:call <SID>align('<Bar>')<CR>a
