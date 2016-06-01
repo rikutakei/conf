@@ -42,7 +42,6 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 "Manage other plugins (i.e. your custom plugins):
 NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'altercation/vim-colors-solarized'
-NeoBundle 'ctrlpvim/ctrlp.vim'
 NeoBundle 'godlygeek/tabular'
 NeoBundle 'jonathanfilip/vim-lucius' " you'll have to symlink or move the lucius.vim file into ~/.vim/colors/ directory for this to work
 NeoBundle 'jpalardy/vim-slime'
@@ -63,6 +62,7 @@ NeoBundle 'Shougo/unite-outline'
 NeoBundle 'Shougo/unite.vim'         " You may have to update it to the latest (possibly unstable) version of Vim to stop this freezing your vim
 NeoBundle 'Shougo/vimproc.vim', {'build': {'unix': g:make}}
 NeoBundle 'termoshtt/unite-bibtex'   " You need to install pybtex from the command line for this to work
+NeoBundle 'thinca/vim-unite-history'
 NeoBundle 'tpope/vim-commentary'
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-repeat'
@@ -242,14 +242,14 @@ call unite#custom#profile('default', 'context', {
 let g:unite_bibtex_bib_files=["~/Documents/References/BibTeX/MSc.bib"]
 
 "Mappings for unite:
-nnoremap <C-p>  :<C-u>Unite -buffer-name=files       -keep-focus   -no-quit file_rec/async:! buffer<cr>
-nnoremap <C-g>m :<C-u>Unite -buffer-name=mru         file_mru<cr>
-nnoremap <C-g>h :<C-u>Unite -buffer-name=help        -start-insert help:!<cr>
-nnoremap <C-g>t :<C-u>Unite -buffer-name=outline     outline:!<cr>
-nnoremap <C-y>  :<C-u>Unite -buffer-name=yank        history/yank:!<cr>
-nnoremap <C-g>b :<C-u>Unite -buffer-name=buffer      buffer:-<cr>
-nnoremap <C-g>r :<C-u>Unite -buffer-name=reference   -start-insert bibtex<cr>
-nnoremap <C-g>c :<C-u>Unite -buffer-name=colorscheme colorscheme<cr>
+nnoremap <C-p>  :<C-u>Unite -buffer-name=files       -start-insert -keep-focus              -no-quit  file_rec/async:! buffer<cr>
+nnoremap <C-g>m :<C-u>Unite -buffer-name=mru         -start-insert file_mru<cr>
+nnoremap <C-g>h :<C-u>Unite -buffer-name=help        -start-insert -direction=dynamicbottom help:!<cr>
+nnoremap <C-g>t :<C-u>Unite -buffer-name=outline     -start-insert -direction=botright      -vertical -winwidth=30     outline:!<cr>
+nnoremap <C-y>  :<C-u>Unite -buffer-name=yank        -start-insert history/yank:!<cr>
+nnoremap <C-g>b :<C-u>Unite -buffer-name=buffer      -start-insert buffer:-<cr>
+nnoremap <C-g>r :<C-u>Unite -buffer-name=reference   -start-insert -direction=dynamicbottom bibtex<cr>
+nnoremap <C-g>c :<C-u>Unite -buffer-name=colorscheme -start-insert colorscheme<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Neocomplete settings:
@@ -414,6 +414,8 @@ nnoremap <C-e> :NERDTreeToggle<CR>
 
 " Show dot files by default (Toggle by pressing I in the menu):
 let g:NERDTreeShowHidden=1
+
+"TODO:add bookmark shortcut
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Syntastic settings:
