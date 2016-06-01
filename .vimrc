@@ -242,14 +242,14 @@ call unite#custom#profile('default', 'context', {
 let g:unite_bibtex_bib_files=["~/Documents/References/BibTeX/MSc.bib"]
 
 "Mappings for unite:
-nnoremap <C-p>  :<C-u>Unite -buffer-name=files       -start-insert -keep-focus              -no-quit  file_rec/async:! buffer<cr>
-nnoremap <C-g>m :<C-u>Unite -buffer-name=mru         -start-insert file_mru<cr>
-nnoremap <C-g>h :<C-u>Unite -buffer-name=help        -start-insert -direction=dynamicbottom help:!<cr>
-nnoremap <C-g>t :<C-u>Unite -buffer-name=outline     -start-insert -direction=botright      -vertical -winwidth=30     outline:!<cr>
-nnoremap <C-y>  :<C-u>Unite -buffer-name=yank        -start-insert history/yank:!<cr>
-nnoremap <C-g>b :<C-u>Unite -buffer-name=buffer      -start-insert buffer:-<cr>
-nnoremap <C-g>r :<C-u>Unite -buffer-name=reference   -start-insert -direction=dynamicbottom bibtex<cr>
-nnoremap <C-g>c :<C-u>Unite -buffer-name=colorscheme -start-insert colorscheme<cr>
+nnoremap <silent> <C-g>b :<C-u>Unite -buffer-name=buffer      -start-insert        buffer:-<cr>
+nnoremap <silent> <C-g>c :<C-u>Unite -buffer-name=colorscheme -start-insert        colorscheme<cr>
+nnoremap <silent> <C-g>h :<C-u>Unite -buffer-name=help        -start-insert        -direction=dynamicbottom help:!<cr>
+nnoremap <silent> <C-g>m :<C-u>Unite -buffer-name=mru         -start-insert        file_mru<cr>
+nnoremap <silent> <C-g>r :<C-u>Unite -buffer-name=reference   -start-insert        -direction=dynamicbottom bibtex<cr>
+nnoremap <silent> <C-g>t :<C-u>Unite -buffer-name=outline     -direction=aboveleft -no-focus                -toggle  -vertical        -winwidth=30 outline:!<cr>
+nnoremap <silent> <C-p>  :<C-u>Unite -buffer-name=files       -start-insert        -keep-focus              -no-quit file_rec/async:! buffer<cr>
+nnoremap <silent> <C-y>  :<C-u>Unite -buffer-name=yank        -start-insert        history/yank:!<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Neocomplete settings:
