@@ -226,6 +226,10 @@ inoremap > <C-r>=<SID>SkipBracket('>')<CR>
 "Mapings to quickly make the document:
 nnoremap <Leader>m :make<CR>
 
+"Autocommand to put the cursor at the position where I was working the last
+"time:
+autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+
 " If you want more key mapping ideas, see :h map-which-keys for a list of key
 " sequences not used by Vim.
 
@@ -243,13 +247,13 @@ let g:unite_bibtex_bib_files=["~/Documents/References/BibTeX/MSc.bib"]
 
 "Mappings for unite:
 nnoremap <silent> <C-g>b :<C-u>Unite -buffer-name=buffer      -start-insert        buffer:-<cr>
-nnoremap <silent> <C-g>c :<C-u>Unite -buffer-name=colorscheme -start-insert        colorscheme<cr>
+nnoremap <silent> <C-g>c :<C-u>Unite -buffer-name=colorscheme colorscheme<cr>
 nnoremap <silent> <C-g>h :<C-u>Unite -buffer-name=help        -start-insert        -direction=dynamicbottom help:!<cr>
 nnoremap <silent> <C-g>m :<C-u>Unite -buffer-name=mru         -start-insert        file_mru<cr>
-nnoremap <silent> <C-g>r :<C-u>Unite -buffer-name=reference   -start-insert        -direction=dynamicbottom bibtex<cr>
-nnoremap <silent> <C-g>t :<C-u>Unite -buffer-name=outline     -direction=aboveleft -no-focus                -toggle  -vertical        -winwidth=30 outline:!<cr>
-nnoremap <silent> <C-p>  :<C-u>Unite -buffer-name=files       -start-insert        -keep-focus              -no-quit file_rec/async:! buffer<cr>
-nnoremap <silent> <C-y>  :<C-u>Unite -buffer-name=yank        -start-insert        history/yank:!<cr>
+nnoremap <silent> <C-g>r :<C-u>Unite -buffer-name=references  -start-insert        -direction=dynamicbottom bibtex<cr>
+nnoremap <silent> <C-g>t :<C-u>Unite -buffer-name=outline     -direction=aboveleft -no-quit                 -no-focus -toggle -vertical -winwidth=30 outline:!<cr>
+nnoremap <silent> <C-p>  :<C-u>Unite -buffer-name=files       -start-insert        file_rec/async:!         buffer<cr>
+" nnoremap <silent> <C-y>  :<C-u>Unite -buffer-name=yank        -start-insert        history/yank:!<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Neocomplete settings:
@@ -474,24 +478,6 @@ function! s:Togglebg()
 	let g:currentbg=-(g:currentbg-1)
 endfunction
 
-" Function to skip all of the closing brackets in a line:
-function! s:SkipAllBracket() abort
-	let close = GetClose('')
-	let close = substitute(close, ' ', '', 'g')
-	let cp = getpos('.')
-	if cp[2] > len(getline('.')
-		return pumvisible() ? "\<C-y>" : "\<CR>"
-	endif
-	let str = getline('.')[cp[2]-1:]
-	while (match(str, '['.close.']') >= 0)
-		let cp[2] = cp[2]+match(str, '['.close.']')+1
-		call setpos('.', cp)
-		let str = str[cp[2]-1:]
-	endwhile
-	call setpos('.', cp)
-	return ""
-endfunction
-
 " Function to skip the specified closing bracket:
 function! s:SkipBracket(char) abort
 	let cp = getpos('.')
@@ -507,7 +493,6 @@ function! s:SkipBracket(char) abort
 endfunction
 
 " Function that deletes any blank lines between lines of text
-" TODO: make this function smaller when I have time
 function! SmartBackSpace()
 	let a = ''
 	let comm = GetComm()
@@ -573,11 +558,11 @@ function! SmartBackSpace()
 			let a = call(function('DeleteBetweenBraces'), [cl, cp-1, ca, comm])
 			return a
 		else
-			let a = call(function('DeleteBetweenBraces'), [cl, cp-1, ca, comm])
+			let a = call(function('DeleteBetweenBraces'), [cl, cp-2, ca, comm])
 			return a
 		endif
 	else
-		let a = call(function('DeleteBetweenBraces'), [cl, cp-3, ca, comm])
+		let a = call(function('DeleteBetweenBraces'), [cl, cp-1, ca, comm])
 		return a
 	endif
 endfunction
@@ -590,7 +575,7 @@ function! DeleteBetweenBraces(cl, cp, ca, comm)
 	while x >= 0
 		let line = getline((a:cl+a:ca)-x)
 		let a = a.tmp
-		if (line =~ '^\s*['.a:comm.']\s*$') || (line =~ '^\s\+$')
+		if (line =~ '^\s*['.a:comm.']\s*$') || (line =~ '^\s\+.*$')
 			let a = a.tmp
 			if line =~ '^\s['.a:comm.']'
 				let a = a.tmp
@@ -604,12 +589,13 @@ endfunction
 " Function to set cursor at the position where you want to start deleting
 function! SetCursor(ca)
 	let t = ''
+	let line = getline(a:ca)
 	let c = a:ca
 	while c > 0
 		let t = t."\<C-g>\<C-j>"
 		let c = c-1
 	endwhile
-	return t."\<ESC>I"
+	return t.'\<ESC>I'
 endfunction
 
 " Function to get the possible comment characters for the current filetype
