@@ -418,6 +418,9 @@ let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 
+" Mapping to toggle syntastic quick fix window:
+nnoremap <C-g>s :SyntasticToggleMode<CR>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Undotree settings:
 
