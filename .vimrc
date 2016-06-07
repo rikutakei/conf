@@ -425,8 +425,8 @@ let g:NERDTreeShowHidden=1
 
 " Show the sytax errors in quick fix list when file is opened:
 let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
+let g:syntastic_auto_loc_list = 0
+let g:syntastic_check_on_open = 0
 let g:syntastic_check_on_wq = 0
 
 " Mapping to toggle syntastic quick fix window:
