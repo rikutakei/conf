@@ -42,7 +42,6 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 "Manage other plugins (i.e. your custom plugins):
 NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'altercation/vim-colors-solarized'
-NeoBundle 'ctrlpvim/ctrlp.vim'
 NeoBundle 'godlygeek/tabular'
 NeoBundle 'jonathanfilip/vim-lucius' " you'll have to symlink or move the lucius.vim file into ~/.vim/colors/ directory for this to work
 NeoBundle 'jpalardy/vim-slime'
@@ -63,6 +62,7 @@ NeoBundle 'Shougo/unite-outline'
 NeoBundle 'Shougo/unite.vim'         " You may have to update it to the latest (possibly unstable) version of Vim to stop this freezing your vim
 NeoBundle 'Shougo/vimproc.vim', {'build': {'unix': g:make}}
 NeoBundle 'termoshtt/unite-bibtex'   " You need to install pybtex from the command line for this to work
+NeoBundle 'thinca/vim-unite-history'
 NeoBundle 'tpope/vim-commentary'
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-repeat'
@@ -223,6 +223,13 @@ inoremap ] <C-r>=<SID>SkipBracket(']')<CR>
 inoremap } <C-r>=<SID>SkipBracket('}')<CR>
 inoremap > <C-r>=<SID>SkipBracket('>')<CR>
 
+"Mapings to quickly make the document:
+nnoremap <Leader>m :make<CR>
+
+"Autocommand to put the cursor at the position where I was working the last
+"time:
+autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+
 " If you want more key mapping ideas, see :h map-which-keys for a list of key
 " sequences not used by Vim.
 
@@ -239,14 +246,14 @@ call unite#custom#profile('default', 'context', {
 let g:unite_bibtex_bib_files=["~/Documents/References/BibTeX/MSc.bib"]
 
 "Mappings for unite:
-nnoremap <C-p>  :<C-u>Unite -buffer-name=files       -keep-focus   -no-quit file_rec/async:! buffer<cr>
-nnoremap <C-m>  :<C-u>Unite -buffer-name=mru         file_mru<cr>
-nnoremap <C-g>h :<C-u>Unite -buffer-name=help        -start-insert help:!<cr>
-nnoremap <C-g>t :<C-u>Unite -buffer-name=outline     outline:!<cr>
-nnoremap <C-y>  :<C-u>Unite -buffer-name=yank        history/yank:!<cr>
-nnoremap <C-g>b :<C-u>Unite -buffer-name=buffer      buffer:-<cr>
-nnoremap <C-g>r :<C-u>Unite -buffer-name=reference   -start-insert bibtex<cr>
-nnoremap <C-g>c :<C-u>Unite -buffer-name=colorscheme colorscheme<cr>
+nnoremap <silent> <C-g>b :<C-u>Unite -buffer-name=buffer      -start-insert        buffer:-<cr>
+nnoremap <silent> <C-g>c :<C-u>Unite -buffer-name=colorscheme colorscheme<cr>
+nnoremap <silent> <C-g>h :<C-u>Unite -buffer-name=help        -start-insert        -direction=dynamicbottom help:!<cr>
+nnoremap <silent> <C-g>m :<C-u>Unite -buffer-name=mru         -start-insert        file_mru<cr>
+nnoremap <silent> <C-g>r :<C-u>Unite -buffer-name=references  -start-insert        -direction=dynamicbottom bibtex<cr>
+nnoremap <silent> <C-g>t :<C-u>Unite -buffer-name=outline     -direction=aboveleft -no-quit                 -no-focus -toggle -vertical -winwidth=30 outline:!<cr>
+nnoremap <silent> <C-p>  :<C-u>Unite -buffer-name=files       -start-insert        file_rec/async:!         buffer<cr>
+" nnoremap <silent> <C-y>  :<C-u>Unite -buffer-name=yank        -start-insert        history/yank:!<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Neocomplete settings:
@@ -341,6 +348,9 @@ vmap <C-a> <Plug>(EasyAlign)<C-f>g/
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Tabular settings:
 
+" Mapping to align symbols that aren't covered in easy-align:
+vmap <Tab>% :Tabularize /%<CR>
+
 " Automatically tabularize text in insert mode when | is encountered:
 " TODO: need to put these into language specific files for loading
 inoremap <Bar> <Bar><Esc>:call <SID>align('<Bar>')<CR>a
@@ -392,7 +402,6 @@ endfunction
 imap ( <Plug>Isurround)
 imap { <Plug>Isurround}
 imap [ <Plug>Isurround]
-imap < <Plug>Isurround>
 
 " Span three lines when you press enter straight after making brackets:
 " (see Tim Pope's surround source code)
@@ -408,6 +417,8 @@ nnoremap <C-e> :NERDTreeToggle<CR>
 
 " Show dot files by default (Toggle by pressing I in the menu):
 let g:NERDTreeShowHidden=1
+
+"TODO:add bookmark shortcut
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Syntastic settings:
@@ -450,8 +461,8 @@ let g:slime_vars={
 
 " Mappings:
 xmap <C-c><C-c> <Plug>SlimeConfig<Plug>SlimeRegionSend
-nmap <expr> <C-c><C-c> <SID>TmuxSend(slime_vars["down"], getline('.')."\r")."<CR>"
-nmap <expr> <C-c><C-r> <SID>TmuxSend(slime_vars["right"], getline('.')."\r")."<CR>"
+nmap <expr> <C-c><C-c> <SID>TmuxSend(slime_vars["down"], getline('.')."\r")
+nmap <expr> <C-c><C-r> <SID>TmuxSend(slime_vars["right"], getline('.')."\r")
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " tagbar settings:
@@ -469,24 +480,6 @@ function! s:Togglebg()
 	let g:currentbg=-(g:currentbg-1)
 endfunction
 
-" Function to skip all of the closing brackets in a line:
-function! s:SkipAllBracket() abort
-	let close = GetClose('')
-	let close = substitute(close, ' ', '', 'g')
-	let cp = getpos('.')
-	if cp[2] > len(getline('.')
-		return pumvisible() ? "\<C-y>" : "\<CR>"
-	endif
-	let str = getline('.')[cp[2]-1:]
-	while (match(str, '['.close.']') >= 0)
-		let cp[2] = cp[2]+match(str, '['.close.']')+1
-		call setpos('.', cp)
-		let str = str[cp[2]-1:]
-	endwhile
-	call setpos('.', cp)
-	return ""
-endfunction
-
 " Function to skip the specified closing bracket:
 function! s:SkipBracket(char) abort
 	let cp = getpos('.')
@@ -502,7 +495,6 @@ function! s:SkipBracket(char) abort
 endfunction
 
 " Function that deletes any blank lines between lines of text
-" TODO: make this function smaller when I have time
 function! SmartBackSpace()
 	let a = ''
 	let comm = GetComm()
@@ -568,11 +560,11 @@ function! SmartBackSpace()
 			let a = call(function('DeleteBetweenBraces'), [cl, cp-1, ca, comm])
 			return a
 		else
-			let a = call(function('DeleteBetweenBraces'), [cl, cp-1, ca, comm])
+			let a = call(function('DeleteBetweenBraces'), [cl, cp-2, ca, comm])
 			return a
 		endif
 	else
-		let a = call(function('DeleteBetweenBraces'), [cl, cp-3, ca, comm])
+		let a = call(function('DeleteBetweenBraces'), [cl, cp-1, ca, comm])
 		return a
 	endif
 endfunction
@@ -585,7 +577,7 @@ function! DeleteBetweenBraces(cl, cp, ca, comm)
 	while x >= 0
 		let line = getline((a:cl+a:ca)-x)
 		let a = a.tmp
-		if (line =~ '^\s*['.a:comm.']\s*$') || (line =~ '^\s\+$')
+		if (line =~ '^\s*['.a:comm.']\s*$') || (line =~ '^\s\+.*$')
 			let a = a.tmp
 			if line =~ '^\s['.a:comm.']'
 				let a = a.tmp
@@ -599,12 +591,13 @@ endfunction
 " Function to set cursor at the position where you want to start deleting
 function! SetCursor(ca)
 	let t = ''
+	let line = getline(a:ca)
 	let c = a:ca
 	while c > 0
 		let t = t."\<C-g>\<C-j>"
 		let c = c-1
 	endwhile
-	return t."\<ESC>I"
+	return t.'\<ESC>I'
 endfunction
 
 " Function to get the possible comment characters for the current filetype
@@ -641,3 +634,31 @@ function! GetClose(comm) abort
 	return close
 endfunction
 
+function! s:TmuxSend(config, text)
+  let l:prefix = "tmux -L " . shellescape(a:config["socket_name"])
+  " use STDIN unless configured to use a file
+  if !exists("g:slime_paste_file")
+    call system(l:prefix . " load-buffer -", a:text)
+  else
+    call s:WritePasteFile(a:text)
+    call system(l:prefix . " load-buffer " . g:slime_paste_file)
+  end
+  call system(l:prefix . " paste-buffer -d -t " . shellescape(a:config["target_pane"]))
+endfunction
+
+function! s:TmuxPaneNames(A,L,P)
+  let format = '#{pane_id} #{session_name}:#{window_index}.#{pane_index} #{window_name}#{?window_active, (active),}'
+  return system("tmux -L " . shellescape(b:slime_config['socket_name']) . " list-panes -a -F " . shellescape(format))
+endfunction
+
+function! s:TmuxConfig() abort
+  if !exists("b:slime_config")
+    let b:slime_config = {"socket_name": "default", "target_pane": ":"}
+  end
+
+  let b:slime_config["socket_name"] = input("tmux socket name: ", b:slime_config["socket_name"])
+  let b:slime_config["target_pane"] = input("tmux target pane: ", b:slime_config["target_pane"], "custom,<SNR>" . s:SID() . "_TmuxPaneNames")
+  if b:slime_config["target_pane"] =~ '\s\+'
+    let b:slime_config["target_pane"] = split(b:slime_config["target_pane"])[0]
+  endif
+endfunction
