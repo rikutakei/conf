@@ -402,7 +402,6 @@ endfunction
 imap ( <Plug>Isurround)
 imap { <Plug>Isurround}
 imap [ <Plug>Isurround]
-imap < <Plug>Isurround>
 
 " Span three lines when you press enter straight after making brackets:
 " (see Tim Pope's surround source code)
