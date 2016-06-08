@@ -176,6 +176,12 @@ nnoremap <silent>  <C-w>-   <C-w>s
 nnoremap <silent>  <C-w>\|  <C-w>v
 nnoremap <silent> <Leader>= <C-w>=
 
+" Mappings for resizing windows:
+nnoremap <silent> <C-w>H <C-w><10
+nnoremap <silent> <C-w>L <C-w>>10
+nnoremap <silent> <C-w>J <C-w>+10
+nnoremap <silent> <C-w>K <C-w>-10
+
 " Mappings for system clipboard yank:
 nnoremap <Leader>y "+y
 vnoremap <Leader>y "+y
