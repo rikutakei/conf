@@ -56,12 +56,11 @@ NeoBundle 'Shougo/context_filetype.vim'
 NeoBundle 'Shougo/neocomplete.vim'
 NeoBundle 'Shougo/neoinclude.vim'
 NeoBundle 'Shougo/neomru.vim'
-NeoBundle 'Shougo/neosnippet-snippets'
-NeoBundle 'Shougo/neosnippet.vim'
 NeoBundle 'Shougo/neoyank.vim'
 NeoBundle 'Shougo/unite-outline'
 NeoBundle 'Shougo/unite.vim'         " You may have to update it to the latest (possibly unstable) version of Vim to stop this freezing your vim
 NeoBundle 'Shougo/vimproc.vim', {'build': {'unix': g:make}}
+NeoBundle 'SirVer/ultisnips'
 NeoBundle 'termoshtt/unite-bibtex'   " You need to install pybtex from the command line for this to work
 NeoBundle 'thinca/vim-unite-history'
 NeoBundle 'tpope/vim-commentary'
@@ -133,6 +132,7 @@ set nojoinspaces               " prevents inserting two spaces after punctuation
 set shiftwidth=4               " Use indents of four spaces
 set softtabstop=4              " let backsapce delete indent
 set tabstop=4                  " An indentation every four columns
+set nodigraph                  " remove the digraph functionality with C-k
 
 " Spell checking and dictionary:
 set dictionary=/usr/share/dict/words       " Set the dictionary directory
@@ -141,6 +141,9 @@ set spellfile=~/.vim/custom-dictionary.add " Set the file to put your custom wor
 " Turn off the annoying "show-the-special-symbol-in-Vim-screen" feature for
 " LaTeX:
 let g:tex_conceal = ""
+
+" Make sure all of the tex files are recognised as 'tex', not 'plaintex':
+let g:tex_flavor = "latex"
 
 " Use Ag as default grep method:
 if executable('ag')
@@ -316,29 +319,22 @@ function! s:check_back_space()
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Neosnippet settings:
+" ultisnippet settings:
 
-" Plugin key-mappings.
-imap <C-k> <Plug>(neosnippet_expand_or_jump)
-smap <C-k> <Plug>(neosnippet_expand_or_jump)
-xmap <C-k> <Plug>(neosnippet_expand_target)
+" Unset all the default values:
+let g:UltiSnipsExpandTrigger="<NOP>"
+let g:UltiSnipsListSnippets="<NOP>"
+let g:UltiSnipsJumpForwardTrigger="<NOP>"
+let g:UltiSnipsJumpBackwardTrigger="<NOP>"
 
-" SuperTab like snippets' behavior.
-imap <expr><TAB>
-			\ pumvisible() ? "\<C-n>" :
-			\ neosnippet#expandable_or_jumpable() ?
-			\    "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
-smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-			\ "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
+" Manually remap the keys to the ultisnip completion command:
+inoremap <silent> <C-k> <C-R>=UltiSnips#ExpandSnippetOrJump()<CR>
+snoremap <silent> <C-k> <C-R>=UltiSnips#ExpandSnippetOrJump()<CR>
+xnoremap <silent> <C-k> :call UltiSnips#SaveLastVisualSelection()<CR>gvs
+inoremap <silent> <C-j> <C-R>=UltiSnips#JumpBackwards()<CR>
+snoremap <silent> <C-j> <C-R>=UltiSnips#JumpBackwards()<CR>
 
-" For conceal markers.
-if has('conceal')
-	set conceallevel=2 concealcursor=niv
-endif
-
-" Enable snipMate compatibility feature.
-let g:neosnippet#enable_snipmate_compatibility = 1
-let g:neosnippet#snippets_directory='~/.vim/bundle/vim-snippets/snippets/'
+"TODO: need to make a (better) file for tex snippets
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Easy align settings:
@@ -572,7 +568,7 @@ function! SmartBackSpace()
 			return a
 		endif
 	else
-		let a = call(function('DeleteBetweenBraces'), [cl, cp-1, ca, comm])
+		let a = call(function('DeleteBetweenBraces'), [cl, cp, ca, comm])
 		return a
 	endif
 endfunction
