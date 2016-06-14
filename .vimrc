@@ -336,6 +336,7 @@ snoremap <silent> <C-j> <C-R>=UltiSnips#JumpBackwards()<CR>
 
 " Mapping and settings for editing personal snippet file:
 let g:UltiSnipsSnippetsDir="~/.vim/mydir/mysnips/Ultisnips"
+set runtimepath+=~/.vim/mydir/mysnips/
 nnoremap <silent> <C-g>x :UltiSnipsEdit<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -570,7 +571,7 @@ function! SmartBackSpace()
 			return a
 		endif
 	else
-		let a = call(function('DeleteBetweenBraces'), [cl, cp, ca, comm])
+		let a = call(function('DeleteBetweenBraces'), [cl, cp-1, ca, comm])
 		return a
 	endif
 endfunction

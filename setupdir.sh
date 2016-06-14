@@ -6,7 +6,7 @@ echo "Starting local personal file directory setup"
 SETUP_DIR=~/.vim/mydir
 UNDO_DIR="$SETUP_DIR/undodir"
 HOME_UNDO_DIR=~/.undodir
-SNIP_DIR="$SETUP_DIR/mysnips/Ultisnips"
+SNIP_DIR="$SETUP_DIR/mysnips/UltiSnips"
 
 # If mydir, undodir and snip directories are already present, abort
 if [ -e "$SETUP_DIR" ] && [ -e "$UNDO_DIR" ] && [ -e "$SNIP_DIR" ]; then
