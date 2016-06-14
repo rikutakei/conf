@@ -327,14 +327,15 @@ let g:UltiSnipsListSnippets="<NOP>"
 let g:UltiSnipsJumpForwardTrigger="<NOP>"
 let g:UltiSnipsJumpBackwardTrigger="<NOP>"
 
-" Manually remap the keys to the ultisnip completion command:
+" Manually remap the keys to the ultisnip completion and jumping command:
 inoremap <silent> <C-k> <C-R>=UltiSnips#ExpandSnippetOrJump()<CR>
 snoremap <silent> <C-k> <C-R>=UltiSnips#ExpandSnippetOrJump()<CR>
 xnoremap <silent> <C-k> :call UltiSnips#SaveLastVisualSelection()<CR>gvs
 inoremap <silent> <C-j> <C-R>=UltiSnips#JumpBackwards()<CR>
 snoremap <silent> <C-j> <C-R>=UltiSnips#JumpBackwards()<CR>
 
-"TODO: need to make a (better) file for tex snippets
+" Mapping and settings for editing personal snippet file:
+let g:UltisnipsSnippetsDir="~/.vim/mydir/mySnips/Ultisnips"
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Easy align settings:
@@ -442,9 +443,9 @@ nnoremap <C-g>s :SyntasticToggleMode<CR>
 " Show/close UndoTree:
 nnoremap <C-u> :UndotreeToggle<CR>
 
-" Set persistent undo (have to make .undodir in your home directory):
+" Set persistent undo (have to make undodir in your home directory):
 if has("persistent_undo")
-	set undodir=~/.undodir/
+	set undodir=~/.vim/mydir/undodir/
 	set undofile
 endif
 
