@@ -336,6 +336,7 @@ snoremap <silent> <C-j> <C-R>=UltiSnips#JumpBackwards()<CR>
 
 " Mapping and settings for editing personal snippet file:
 let g:UltisnipsSnippetsDir="~/.vim/mydir/mySnips/Ultisnips"
+nnoremap <silent> <C-g>x :UltiSnipsEdit<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Easy align settings:
