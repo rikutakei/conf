@@ -1,0 +1,9 @@
+snippet heat2 "heatmap.2" b
+heatmap.2(x=${1}, scale='none', trace='none', col='bluered', main=${2:plotname})
+endsnippet
+
+snippet pdf "pdf" b
+pdf(file='${1}', width=${2:7}, height=${3:7})
+${VISUAL}$0
+dev.off()
+endsnippet

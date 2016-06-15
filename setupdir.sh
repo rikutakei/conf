@@ -6,7 +6,7 @@ echo "Starting local personal file directory setup"
 SETUP_DIR=~/.vim/mydir
 UNDO_DIR="$SETUP_DIR/undodir"
 HOME_UNDO_DIR=~/.undodir
-SNIP_DIR="$SETUP_DIR/mysnips/UltiSnips"
+SNIP_DIR="$SETUP_DIR/mysnips/"
 
 # If mydir, undodir and snip directories are already present, abort
 if [ -e "$SETUP_DIR" ] && [ -e "$UNDO_DIR" ] && [ -e "$SNIP_DIR" ]; then
@@ -35,6 +35,8 @@ fi
 if ! [ -e "$SNIP_DIR" ]; then
 	echo "Creating your local snippet directory"
 	mkdir -p "$SNIP_DIR"
+	echo "Creating symbolic link to my personal snippets"
+	ln -s /home/riku/Documents/codes/conf/UltiSnips /home/riku/.vim/mydir/mysnips/UltiSnips
 fi
 
 echo "Done."

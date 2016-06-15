@@ -96,6 +96,7 @@ let g:currentbg=0            " Counter for toggling background (0 or 1)
 
 " General use interface settings:
 set backspace=indent,eol,start " Allow backspace from where you pressed insert
+set hidden                     " Allow switching to different buffer/files without saving
 set history=1000               " Set the max number of history to remember
 set incsearch                  " Turn on incremental search
 set laststatus=2               " Always have statusline
@@ -118,7 +119,7 @@ set splitright                 " Vertical split will split the window to the rig
 set ttimeout                   " Together with the line above, this will set it to time out for key codes, but not mappings
 set ttimeoutlen=10             " Set time out length to 10 milliseconds
 set virtualedit=block          " Allow you to move cursor to position with no characters (e.g past eol)
-                               " set gdefault                                     " If you want to make the g flag default for substitution, uncomment this line
+" set gdefault                 " If you want to make the g flag default for substitution, uncomment this line
 set visualbell t_vb=           " Remove visual and/or sound notification for errors
 set wildmenu                   " Show list of matches
 set wildmode=full
@@ -335,7 +336,7 @@ inoremap <silent> <C-j> <C-R>=UltiSnips#JumpBackwards()<CR>
 snoremap <silent> <C-j> <C-R>=UltiSnips#JumpBackwards()<CR>
 
 " Mapping and settings for editing personal snippet file:
-let g:UltiSnipsSnippetsDir="~/.vim/mydir/mysnips/Ultisnips"
+let g:UltiSnipsSnippetsDir="~/.vim/mydir/mysnips/UltiSnips"
 set runtimepath+=~/.vim/mydir/mysnips/
 nnoremap <silent> <C-g>x :UltiSnipsEdit<CR>
 
@@ -351,6 +352,19 @@ vmap <CR>  <Plug>(EasyAlign)
 
 " Mappings for filter aligning:
 vmap <C-a> <Plug>(EasyAlign)<C-f>g/
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Fugitive settings:
+
+" TODO: add some mappings for fugitive commands like gstatus/gdiff/gwrite/gread
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Gitgutter settings:
+
+" Mappings to skip to hunks of changes:
+nnoremap <silent> <C-n> :GitGutterNextHunk<CR>
+nnoremap <silent> <C-k> :GitGutterPrevHunk<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Tabular settings:
