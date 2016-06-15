@@ -36,7 +36,7 @@ if ! [ -e "$SNIP_DIR" ]; then
 	echo "Creating your local snippet directory"
 	mkdir -p "$SNIP_DIR"
 	echo "Creating symbolic link to my personal snippets"
-	ln -s /home/riku/Documents/codes/conf/UltiSnips /home/riku/.vim/mydir/mysnips/UltiSnips
+	ln -s /home/riku/Documents/codes/conf/UltiSnips /home/riku/.vim/mydir/mysnips/
 fi
 
 echo "Done."
