@@ -72,6 +72,7 @@ NeoBundle 'tsukkee/unite-tag'
 NeoBundle 'ujihisa/unite-colorscheme'
 NeoBundle 'xolox/vim-easytags'       " You need to install exuberant-ctags
 NeoBundle 'xolox/vim-misc'
+NeoBundle 'osyo-manga/unite-quickfix'
 
 call neobundle#end()
 
@@ -257,14 +258,15 @@ call unite#custom#profile('default', 'context', {
 let g:unite_bibtex_bib_files=["~/Documents/References/BibTeX/MSc.bib"]
 
 "Mappings for unite:
-nnoremap <silent> <C-g>b :<C-u>Unite -buffer-name=buffer      -start-insert        buffer:-<cr>
+nnoremap <silent> <C-g>b :<C-u>Unite -buffer-name=buffer      -start-insert            buffer:-<cr>
 nnoremap <silent> <C-g>c :<C-u>Unite -buffer-name=colorscheme colorscheme<cr>
-nnoremap <silent> <C-g>h :<C-u>Unite -buffer-name=help        -start-insert        -direction=dynamicbottom help:!<cr>
-nnoremap <silent> <C-g>m :<C-u>Unite -buffer-name=mru         -start-insert        file_mru<cr>
-nnoremap <silent> <C-g>r :<C-u>Unite -buffer-name=references  -start-insert        -direction=dynamicbottom bibtex<cr>
-nnoremap <silent> <C-g>t :<C-u>Unite -buffer-name=outline     -direction=aboveleft -no-quit                 -no-focus -toggle -vertical -winwidth=30 outline:!<cr>
-nnoremap <silent> <C-p>  :<C-u>Unite -buffer-name=files       -start-insert        file_rec/async:!         buffer<cr>
-" nnoremap <silent> <C-y>  :<C-u>Unite -buffer-name=yank        -start-insert        history/yank:!<cr>
+nnoremap <silent> <C-g>h :<C-u>Unite -buffer-name=help        -start-insert            -direction=dynamicbottom help:!<cr>
+nnoremap <silent> <C-g>m :<C-u>Unite -buffer-name=mru         -start-insert            file_mru<cr>
+nnoremap <silent> <C-g>r :<C-u>Unite -buffer-name=references  -start-insert            -direction=dynamicbottom bibtex<cr>
+nnoremap <silent> <C-g>s :<C-u>Unite -buffer-name=syntastic   -direction=dynamicbottom -no-quit                 -toggle   -winheight=5 location_list<cr>
+nnoremap <silent> <C-g>t :<C-u>Unite -buffer-name=outline     -direction=aboveleft     -no-quit                 -no-focus -toggle      -vertical -winwidth=30 outline:!<cr>
+nnoremap <silent> <C-p>  :<C-u>Unite -buffer-name=files       -start-insert            file_rec/async:!         buffer<cr>
+nnoremap <silent> <C-y>  :<C-u>Unite -buffer-name=yank        -start-insert            history/yank             -default-action=append<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Neocomplete settings:
@@ -449,9 +451,7 @@ let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 0
 let g:syntastic_check_on_open = 0
 let g:syntastic_check_on_wq = 0
-
-" Mapping to toggle syntastic quick fix window:
-nnoremap <C-g>s :SyntasticToggleMode<CR>
+let g:syntastic_loc_list_height= 5
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Undotree settings:
