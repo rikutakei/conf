@@ -44,11 +44,13 @@ NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'altercation/vim-colors-solarized'
 NeoBundle 'godlygeek/tabular'
 NeoBundle 'honza/vim-snippets'
+NeoBundle 'jalvesaq/nvim-r'
 NeoBundle 'jonathanfilip/vim-lucius' " you'll have to symlink or move the lucius.vim file into ~/.vim/colors/ directory for this to work
 NeoBundle 'jpalardy/vim-slime'
 NeoBundle 'junegunn/vim-easy-align'
 NeoBundle 'majutsushi/tagbar'
 NeoBundle 'mbbill/undotree'
+NeoBundle 'osyo-manga/unite-quickfix'
 NeoBundle 'rking/ag.vim'             " You'll have to install silversearcher-ag from command line
 NeoBundle 'scrooloose/nerdtree'
 NeoBundle 'scrooloose/syntastic'
@@ -157,12 +159,13 @@ endif
 
 " Change the default leader key (\) to space key:
 let mapleader = " "
+let maplocalleader = "\\"
 
 " Mapping to toggle text wrapping:
 nnoremap <expr> gr &wrap == 1 ? ":set nowrap\<CR>" : ":set wrap\<CR>"
 
 " Mappings to (re)load .vimrc file:
-nnoremap <Leader>r :so ~/.vimrc<CR>
+nnoremap <Leader>l :so ~/.vimrc<CR>
 
 " Mappings to make moving around wrapped text easier:
 nnoremap j gj
@@ -257,14 +260,15 @@ call unite#custom#profile('default', 'context', {
 let g:unite_bibtex_bib_files=["~/Documents/References/BibTeX/MSc.bib"]
 
 "Mappings for unite:
-nnoremap <silent> <C-g>b :<C-u>Unite -buffer-name=buffer      -start-insert        buffer:-<cr>
+nnoremap <silent> <C-g>b :<C-u>Unite -buffer-name=buffer      -start-insert            buffer:-<cr>
 nnoremap <silent> <C-g>c :<C-u>Unite -buffer-name=colorscheme colorscheme<cr>
-nnoremap <silent> <C-g>h :<C-u>Unite -buffer-name=help        -start-insert        -direction=dynamicbottom help:!<cr>
-nnoremap <silent> <C-g>m :<C-u>Unite -buffer-name=mru         -start-insert        file_mru<cr>
-nnoremap <silent> <C-g>r :<C-u>Unite -buffer-name=references  -start-insert        -direction=dynamicbottom bibtex<cr>
-nnoremap <silent> <C-g>t :<C-u>Unite -buffer-name=outline     -direction=aboveleft -no-quit                 -no-focus -toggle -vertical -winwidth=30 outline:!<cr>
-nnoremap <silent> <C-p>  :<C-u>Unite -buffer-name=files       -start-insert        file_rec/async:!         buffer<cr>
-" nnoremap <silent> <C-y>  :<C-u>Unite -buffer-name=yank        -start-insert        history/yank:!<cr>
+nnoremap <silent> <C-g>h :<C-u>Unite -buffer-name=help        -start-insert            -direction=dynamicbottom help:!<cr>
+nnoremap <silent> <C-g>m :<C-u>Unite -buffer-name=mru         -start-insert            file_mru<cr>
+nnoremap <silent> <C-g>r :<C-u>Unite -buffer-name=references  -start-insert            -direction=dynamicbottom bibtex<cr>
+nnoremap <silent> <C-g>s :<C-u>Unite -buffer-name=syntastic   -direction=dynamicbottom -no-quit                 -toggle   -winheight=5 location_list<cr>
+nnoremap <silent> <C-g>t :<C-u>Unite -buffer-name=outline     -direction=aboveleft     -no-quit                 -no-focus -toggle      -vertical -winwidth=30 outline:!<cr>
+nnoremap <silent> <C-p>  :<C-u>Unite -buffer-name=files       -start-insert            file_rec/async:!         buffer<cr>
+nnoremap <silent> <C-y>  :<C-u>Unite -buffer-name=yank        -start-insert            history/yank             -default-action=append<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Neocomplete settings:
@@ -441,6 +445,35 @@ let g:NERDTreeShowHidden=1
 
 "TODO:add bookmark shortcut
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Nvim-R settings:
+
+" if has("gui_running")
+"     inoremap <C-TAB> <C-x><C-o>
+" else
+"     inoremap <C-TAB> <C-x><C-o>
+" endif
+vmap <C-m> <Plug>RDSendSelection
+nmap <C-m> <Plug>RDSendLine
+
+" Split window in tmux when starting R:
+let R_in_buffer = 0
+let R_applescript = 0
+let R_tmux_split = 1
+
+" Object browser config:
+let R_objbr_place = "script,right"
+let R_objbr_opendf = 1    " Show data.frames elements
+let R_objbr_openlist = 0  " Show lists elements
+let R_objbr_allnames = 0  " Show .GlobalEnv hidden objects
+let R_objbr_labelerr = 1  " Warn if label is not a valid text
+
+" " Completion setup:
+" let R_show_args = 1
+
+
+
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Syntastic settings:
 
@@ -449,9 +482,7 @@ let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 0
 let g:syntastic_check_on_open = 0
 let g:syntastic_check_on_wq = 0
-
-" Mapping to toggle syntastic quick fix window:
-nnoremap <C-g>s :SyntasticToggleMode<CR>
+let g:syntastic_loc_list_height= 5
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Undotree settings:
