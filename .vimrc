@@ -471,9 +471,6 @@ let R_objbr_labelerr = 1  " Warn if label is not a valid text
 " " Completion setup:
 " let R_show_args = 1
 
-
-
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Syntastic settings:
 
