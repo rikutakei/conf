@@ -518,7 +518,7 @@ endfunction
 " Function that deletes any blank lines between lines of text
 function! SmartBackSpace()
 	let a = ''
-	let comm = GetComm()
+	let comm = escape(GetComm(), '\-*.^$+?')
 	let open = GetOpen(comm)
 	let close = GetClose(comm)
 	let cl = line('.')   " current line number
