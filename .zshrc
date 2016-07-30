@@ -87,5 +87,5 @@ zle -N down-line-or-beginning-search
 eval $(thefuck --alias)
 eval `dircolors ~/.dircolors`
 
-
+export TERM=xterm-256color
 
