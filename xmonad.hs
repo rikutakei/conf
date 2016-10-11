@@ -29,16 +29,6 @@ myManageHook = composeAll
 	className =? "chromium" --> viewShift "2:web",
 	className =? "dolphin" --> viewShift "3:files",
 	className =? "Gnome-terminal" --> doF W.swapDown,
-	-- className =? "plasma" --> doFloat,
-	-- className =? "Plasma" --> doFloat,
-	-- className =? "plasma-desktop" --> doFloat,
-	-- className =? "Plasma-desktop" --> doFloat,
-	-- className =? "kmix" --> doFloat,
-	-- className =? "Kmix" --> doFloat,
-	-- className =? "krunner" --> doFloat,
-	-- className =? "ksplashsimple" --> doFloat,
-	-- className =? "ksplashqml" --> doFloat,
-	-- className =? "ksplashx" --> doFloat,
 	manageDocks,
 	isFullscreen --> doFullFloat
 	]
