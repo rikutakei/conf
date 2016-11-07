@@ -37,6 +37,7 @@ PLUSMINUS="\u00b1"
 
 # Aliases:
 alias ls='ls --color=auto'
+alias tmux="TERM=screen-256color-bce tmux"
 
 # Prompt settings:
 prompt off
@@ -87,7 +88,7 @@ zle -N down-line-or-beginning-search
 eval $(thefuck --alias)
 eval `dircolors ~/.dircolors`
 
-export TERM=xterm-256color
+# export TERM=xterm-256color
 
 if ! pgrep -u $USER ssh-agent > /dev/null; then
 	ssh-agent > ~/.ssh-agent-thing
