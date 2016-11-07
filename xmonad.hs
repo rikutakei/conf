@@ -5,6 +5,7 @@ import XMonad.Actions.CycleWS
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.ManageDocks
 import XMonad.Layout.NoBorders
+import XMonad.Layout.ResizableTile
 import XMonad.Hooks.InsertPosition
 import XMonad.Util.EZConfig (additionalKeys)
 import qualified XMonad.StackSet as W
@@ -14,10 +15,10 @@ main = do
 		{
 		  modMask = myModMask
 		, terminal = myTerminal
-		, focusFollowsMouse = False
+		, focusFollowsMouse = True
 		, workspaces = myWorkSpaces
 		, manageHook = manageHook kde4Config <+> myManageHook
-		, layoutHook = smartBorders . avoidStruts $ layoutHook kde4Config
+		, layoutHook = smartBorders . avoidStruts $ layoutHook kde4Config ||| ResizableTall 1 (5/100) (1/2) []
 		} `additionalKeys` myAdditionalKeys
 
 myModMask = mod4Mask
@@ -26,7 +27,7 @@ myTerminal = "gnome-terminal"
 myManageHook = composeAll
 	[
 	className =? "banshee" --> doShift "=",
-	className =? "chromium" --> viewShift "2:web",
+	className =? "Chromium" --> viewShift "2:web",
 	className =? "dolphin" --> viewShift "3:files",
 	className =? "Gnome-terminal" --> doF W.swapDown,
 	manageDocks,
@@ -42,6 +43,8 @@ myAdditionalKeys =
 	((myModMask, xK_z), toggleWS),
 	((myModMask, xK_c), moveTo Next NonEmptyWS),
 	((myModMask, xK_x), moveTo Prev NonEmptyWS),
+	((myModMask, xK_d), sendMessage MirrorShrink),
+	((myModMask, xK_u), sendMessage MirrorExpand),
 	((myModMask .|. shiftMask, xK_BackSpace), kill),
 	((myModMask .|. shiftMask, xK_c), moveTo Next EmptyWS),
 	((myModMask .|. shiftMask, xK_x), moveTo Prev EmptyWS),
