@@ -66,6 +66,7 @@ NeoBundle 'SirVer/ultisnips'
 NeoBundle 'termoshtt/unite-bibtex'   " You need to install pybtex from the command line for this to work
 NeoBundle 'thinca/vim-unite-history'
 NeoBundle 'tpope/vim-commentary'
+NeoBundle 'tpope/vim-dispatch'
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-repeat'
 NeoBundle 'tpope/vim-surround'
@@ -240,12 +241,18 @@ inoremap > <C-r>=<SID>SkipBracket('>')<CR>
 "Mapings to quickly make the document:
 nnoremap <Leader>m :make<CR>
 
+" If you want more key mapping ideas, see :h map-which-keys for a list of key
+" sequences not used by Vim.
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Autocommands:
+
+" Autocommand to run make when I save a tex file:
+autocmd BufWritePost *.tex :Make!
+
 "Autocommand to put the cursor at the position where I was working the last
 "time:
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
-
-" If you want more key mapping ideas, see :h map-which-keys for a list of key
-" sequences not used by Vim.
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Unite settings:
