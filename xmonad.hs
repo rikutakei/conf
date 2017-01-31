@@ -30,6 +30,7 @@ myManageHook = composeAll
 	className =? "Chromium" --> viewShift "2:web",
 	className =? "dolphin" --> viewShift "3:files",
 	className =? "Gnome-terminal" --> doF W.swapDown,
+	className =? "plasmashell" --> doFloat, -- for KDE volume popup (and other stuff too)
 	manageDocks,
 	isFullscreen --> doFullFloat
 	]
