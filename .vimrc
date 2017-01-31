@@ -341,10 +341,10 @@ let g:UltiSnipsJumpBackwardTrigger="<NOP>"
 
 " Manually remap the keys to the ultisnip completion and jumping command:
 inoremap <silent> <C-k> <C-R>=UltiSnips#ExpandSnippetOrJump()<CR>
-snoremap <silent> <C-k> <C-R>=UltiSnips#ExpandSnippetOrJump()<CR>
+snoremap <silent> <C-k> <ESC>:call UltiSnips#JumpForwards()<CR>
 xnoremap <silent> <C-k> :call UltiSnips#SaveLastVisualSelection()<CR>gvs
 inoremap <silent> <C-j> <C-R>=UltiSnips#JumpBackwards()<CR>
-snoremap <silent> <C-j> <C-R>=UltiSnips#JumpBackwards()<CR>
+snoremap <silent> <C-j> <ESC>:call UltiSnips#JumpBackwards()<CR>
 
 " Mapping and settings for editing personal snippet file:
 let g:UltiSnipsSnippetsDir="~/.vim/mydir/mysnips/UltiSnips"
