@@ -2,6 +2,7 @@ import XMonad
 import Control.Monad (liftM2)
 import XMonad.Config.Kde
 import XMonad.Actions.CycleWS
+import XMonad.Actions.GridSelect
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.ManageDocks
 import XMonad.Layout.NoBorders
@@ -46,6 +47,7 @@ myAdditionalKeys =
 	((myModMask, xK_x), moveTo Prev NonEmptyWS),
 	((myModMask, xK_d), sendMessage MirrorShrink),
 	((myModMask, xK_u), sendMessage MirrorExpand),
+	((myModMask, xK_g), goToSelected defaultGSConfig),
 	((myModMask .|. shiftMask, xK_BackSpace), kill),
 	((myModMask .|. shiftMask, xK_c), moveTo Next EmptyWS),
 	((myModMask .|. shiftMask, xK_x), moveTo Prev EmptyWS),
