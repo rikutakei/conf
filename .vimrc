@@ -54,6 +54,7 @@ NeoBundle 'osyo-manga/unite-quickfix'
 NeoBundle 'rking/ag.vim'             " You'll have to install silversearcher-ag from command line
 NeoBundle 'scrooloose/nerdtree'
 NeoBundle 'scrooloose/syntastic'
+NeoBundle 'shanzi/autoHEADER'
 NeoBundle 'Shougo/context_filetype.vim'
 NeoBundle 'Shougo/neocomplete.vim'
 NeoBundle 'Shougo/neoinclude.vim'
