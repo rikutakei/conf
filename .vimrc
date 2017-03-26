@@ -67,6 +67,7 @@ NeoBundle 'SirVer/ultisnips'
 NeoBundle 'termoshtt/unite-bibtex'   " You need to install pybtex from the command line for this to work
 NeoBundle 'thinca/vim-unite-history'
 NeoBundle 'tpope/vim-commentary'
+NeoBundle 'kana/vim-submode'
 NeoBundle 'tpope/vim-dispatch'
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-repeat'
@@ -139,6 +140,13 @@ set softtabstop=4              " let backsapce delete indent
 set tabstop=4                  " An indentation every four columns
 set nodigraph                  " remove the digraph functionality with C-k
 
+" Change some highlighting colours:
+:hi IncSearch  term=reverse   cterm=reverse   ctermfg=1
+:hi SpellBad   term=undercurl cterm=undercurl gui=undercurl ctermfg=5
+:hi SpellCap   term=undercurl cterm=undercurl gui=undercurl ctermfg=5
+:hi SpellRare  term=undercurl cterm=undercurl gui=undercurl ctermfg=5
+:hi SpellLocal term=undercurl cterm=undercurl gui=undercurl ctermfg=5
+
 " Spell checking and dictionary:
 set dictionary=/usr/share/dict/words       " Set the dictionary directory
 set spellfile=~/.vim/custom-dictionary.add " Set the file to put your custom words in
@@ -164,7 +172,7 @@ let mapleader = " "
 let maplocalleader = "\\"
 
 " Mapping to toggle text wrapping:
-nnoremap <expr> gr &wrap == 1 ? ":set nowrap\<CR>" : ":set wrap\<CR>"
+nnoremap <silent> <expr> gr &wrap == 1 ? ":set nowrap\<CR>" : ":set wrap\<CR>"
 
 " Mappings to (re)load .vimrc file:
 nnoremap <Leader>l :so ~/.vimrc<CR>
@@ -221,12 +229,17 @@ nnoremap <silent> cob :call <SID>Togglebg()<CR>
 " Mapping for toggling search highlighting (only in normal mode):
 nnoremap <silent> <BS> :set hlsearch!<CR>
 
-" Change some highlighting colours:
-:hi IncSearch term=reverse cterm=reverse ctermfg=1
-
-" TODO: checkout spell checking in vim
 " Mapping for toggling spell checking (only in normal mode):
-" cnoremap <silent>  :set hlsearch!<CR>
+nnoremap <silent> <expr> <Leader>s &spell == 1 ? ":set nospell\<CR>" : ":set spell\<CR>"
+
+" Mapping to move between incorrectly spelled words:
+call submode#enter_with('spell_check', 'n', '', '<leader>n', ']s')
+call submode#map('spell_check', 'n', '', 'n', ']s')
+call submode#map('spell_check', 'n', '', 'N', '[s')
+call submode#map('spell_check', 'n', '', 'j', 'j')
+call submode#map('spell_check', 'n', '', 'k', 'k')
+call submode#map('spell_check', 'n', '', '<C-f>', '<C-f>')
+call submode#map('spell_check', 'n', '', '<C-b>', '<C-b>')
 
 " Mapping for deleting blank lines between two lines of text
 nnoremap <expr> dd (getline('.') =~ '^\s*$') ? "i\<C-r>=SmartBackSpace()\<CR>\<ESC>" : "dd"
