@@ -221,6 +221,9 @@ nnoremap <silent> cob :call <SID>Togglebg()<CR>
 " Mapping for toggling search highlighting (only in normal mode):
 nnoremap <silent> <BS> :set hlsearch!<CR>
 
+" Change some highlighting colours:
+:hi IncSearch term=reverse cterm=reverse ctermfg=1
+
 " TODO: checkout spell checking in vim
 " Mapping for toggling spell checking (only in normal mode):
 " cnoremap <silent>  :set hlsearch!<CR>
