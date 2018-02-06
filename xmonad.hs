@@ -9,6 +9,7 @@ import XMonad.Layout.NoBorders
 import XMonad.Layout.ResizableTile
 import XMonad.Hooks.InsertPosition
 import XMonad.Util.EZConfig (additionalKeys)
+import XMonad.Util.WorkspaceCompare
 import qualified XMonad.StackSet as W
 
 main = do
@@ -54,22 +55,9 @@ myAdditionalKeys =
 	((myModMask .|. shiftMask, xK_l), shiftToNext >> nextWS),
 	((myModMask .|. shiftMask, xK_h), shiftToPrev >> prevWS)
 	] ++ [
-		( (myModMask, xK_0), (windows $ W.greedyView ws))
-		| (xk_0, ws) <- myExtraWorkSpaces
+		( (myModMask, k), (windows $ W.greedyView i))
+		| (i, k) <- zip(myWorkSpaces) ([xK_1 .. xK_9] ++ [xK_0,xK_minus,xK_equal])
 	] ++ [
-		( (myModMask .|. shiftMask, xk_0), (windows $ W.shift ws))
-		| (xk_0, ws) <- myExtraWorkSpaces
-	] ++ [
-		( (myModMask, xK_minus), (windows $ W.greedyView ws))
-		| (xK_minus, ws) <- myExtraWorkSpaces
-	] ++ [
-		( (myModMask .|. shiftMask, xK_minus), (windows $ W.shift ws))
-		| (xK_minus, ws) <- myExtraWorkSpaces
-	] ++ [
-		( (myModMask, xK_equal), (windows $ W.greedyView ws))
-		| (xK_equal, ws) <- myExtraWorkSpaces
-	] ++ [
-		( (myModMask .|. shiftMask, xK_equal), (windows $ W.shift ws))
-		| (xK_equal, ws) <- myExtraWorkSpaces
-	] ++ [
+		( (myModMask .|. shiftMask, k), (windows $ W.shift i) >> (windows $ W.greedyView i))
+		| (i, k) <- zip(myWorkSpaces) ([xK_1 .. xK_9] ++ [xK_0,xK_minus,xK_equal])
 	]
