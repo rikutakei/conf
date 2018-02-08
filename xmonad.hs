@@ -39,8 +39,8 @@ myManageHook = composeAll
 
 viewShift = doF . liftM2 (.) W.greedyView W.shift
 
-myWorkSpaces = ["1:default","2:web","3:files","4","5","6","7","8","9","0"] ++ (map snd myExtraWorkSpaces)
-myExtraWorkSpaces = [(xK_0, "0"),(xK_minus, "-"),(xK_equal, "=")]
+myWorkSpaces = [ "1:default", "2:web", "3:files", "4", "5", "6", "7", "8", "9", "0", "-", "="]
+workspaceKeys= [xK_1, xK_2, xK_3, xK_4, xK_5, xK_6, xK_7, xK_8, xK_9, xK_0, xK_minus, xK_equal ]
 myAdditionalKeys =
 	[-- Your other hotkeys
 	((myModMask, xK_z), toggleWS),
@@ -56,8 +56,8 @@ myAdditionalKeys =
 	((myModMask .|. shiftMask, xK_h), shiftToPrev >> prevWS)
 	] ++ [
 		( (myModMask, k), (windows $ W.greedyView i))
-		| (i, k) <- zip(myWorkSpaces) ([xK_1 .. xK_9] ++ [xK_0,xK_minus,xK_equal])
+		| (i, k) <- zip myWorkSpaces workspaceKeys
 	] ++ [
 		( (myModMask .|. shiftMask, k), (windows $ W.shift i) >> (windows $ W.greedyView i))
-		| (i, k) <- zip(myWorkSpaces) ([xK_1 .. xK_9] ++ [xK_0,xK_minus,xK_equal])
+		| (i, k) <- zip myWorkSpaces workspaceKeys
 	]
