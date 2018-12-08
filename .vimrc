@@ -181,6 +181,12 @@ nnoremap <Leader>l :so ~/.vimrc<CR>
 nnoremap j gj
 nnoremap k gk
 
+" Mappings to make moving around text easier:
+nnoremap <C-h> 10h
+nnoremap <C-l> 10l
+nnoremap <C-j> 10j
+nnoremap <C-k> 10k
+
 " Mappings to make saving and quitting easier:
 nnoremap <Leader>w :w<CR>
 nnoremap <Leader>q :q<CR>
@@ -392,7 +398,7 @@ vmap <C-a> <Plug>(EasyAlign)<C-f>g/
 
 " Mappings to skip to hunks of changes:
 nnoremap <silent> <C-n> :GitGutterNextHunk<CR>
-nnoremap <silent> <C-k> :GitGutterPrevHunk<CR>
+nnoremap <silent> <C-i> :GitGutterPrevHunk<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Tabular settings:

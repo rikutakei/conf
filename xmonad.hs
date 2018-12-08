@@ -31,6 +31,8 @@ myManageHook = composeAll
 	className =? "banshee" --> doShift "=",
 	className =? "Chromium" --> viewShift "2:web",
 	className =? "dolphin" --> viewShift "3:files",
+	className =? "Ardour" --> viewShift "4:Ardour",
+	className =? "digikam" --> viewShift "5:DigiKam",
 	className =? "Gnome-terminal" --> doF W.swapDown,
 	className =? "plasmashell" --> doFloat, -- for KDE volume popup (and other stuff too)
 	manageDocks,
@@ -39,7 +41,7 @@ myManageHook = composeAll
 
 viewShift = doF . liftM2 (.) W.greedyView W.shift
 
-myWorkSpaces = [ "1:default", "2:web", "3:files", "4", "5", "6", "7", "8", "9", "0", "-", "="]
+myWorkSpaces = [ "1:default", "2:web", "3:files", "4:Ardour", "5:DigiKam", "6", "7", "8", "9", "0", "-", "="]
 workspaceKeys= [xK_1, xK_2, xK_3, xK_4, xK_5, xK_6, xK_7, xK_8, xK_9, xK_0, xK_minus, xK_equal ]
 myAdditionalKeys =
 	[-- Your other hotkeys
