@@ -20,7 +20,7 @@ endif
 
 "Include the neobundle directory in the runtime path, so plugins are visible to
 "Vim
-set runtimepath+=~/.vim/bundle/neobundle.vim/
+set runtimepath+=~/.vim/dein/repos/github.com/Shougo/dein.vim
 
 "Automatically set what kind of 'make' to use for compiling vimproc.vim:
 let g:make = 'gmake'
@@ -31,54 +31,56 @@ if system('uname -o') =~ '^GNU/'
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Neobundle package management:
+" Dein package management:
 
-"Start neobundle package manager:
-call neobundle#begin(expand('~/.vim/bundle/'))
+"Start dein package manager:
+if dein#load_state('~/.vim/dein')
+	call dein#begin('~/.vim/dein')
 
-"Manage Neobundle first:
-NeoBundleFetch 'Shougo/neobundle.vim'
+	"Manage Neobundle first:
+	call dein#add('~/.vim/dein/repos/github.com/Shougo/dein.vim')
 
-"Manage other plugins (i.e. your custom plugins):
-NeoBundle 'airblade/vim-gitgutter'
-NeoBundle 'altercation/vim-colors-solarized'
-NeoBundle 'godlygeek/tabular'
-NeoBundle 'honza/vim-snippets'
-NeoBundle 'jalvesaq/nvim-r'
-NeoBundle 'jonathanfilip/vim-lucius' " you'll have to symlink or move the lucius.vim file into ~/.vim/colors/ directory for this to work
-NeoBundle 'jpalardy/vim-slime'
-NeoBundle 'junegunn/vim-easy-align'
-NeoBundle 'majutsushi/tagbar'
-NeoBundle 'mbbill/undotree'
-NeoBundle 'osyo-manga/unite-quickfix'
-NeoBundle 'rking/ag.vim'             " You'll have to install silversearcher-ag from command line
-NeoBundle 'scrooloose/nerdtree'
-NeoBundle 'scrooloose/syntastic'
-NeoBundle 'shanzi/autoHEADER'
-NeoBundle 'Shougo/context_filetype.vim'
-NeoBundle 'Shougo/neocomplete.vim'
-NeoBundle 'Shougo/neoinclude.vim'
-NeoBundle 'Shougo/neomru.vim'
-NeoBundle 'Shougo/neoyank.vim'
-NeoBundle 'Shougo/unite-outline'
-NeoBundle 'Shougo/unite.vim'         " You may have to update it to the latest (possibly unstable) version of Vim to stop this freezing your vim
-NeoBundle 'Shougo/vimproc.vim', {'build': {'unix': g:make}}
-NeoBundle 'SirVer/ultisnips'
-NeoBundle 'termoshtt/unite-bibtex'   " You need to install pybtex from the command line for this to work
-NeoBundle 'thinca/vim-unite-history'
-NeoBundle 'tpope/vim-commentary'
-NeoBundle 'kana/vim-submode'
-NeoBundle 'tpope/vim-dispatch'
-NeoBundle 'tpope/vim-fugitive'
-NeoBundle 'tpope/vim-repeat'
-NeoBundle 'tpope/vim-surround'
-NeoBundle 'tsukkee/unite-help'
-NeoBundle 'tsukkee/unite-tag'
-NeoBundle 'ujihisa/unite-colorscheme'
-NeoBundle 'xolox/vim-easytags'       " You need to install exuberant-ctags
-NeoBundle 'xolox/vim-misc'
+	"Manage other plugins (i.e. your custom plugins):
+	call dein#add('airblade/vim-gitgutter')
+	call dein#add('altercation/vim-colors-solarized')
+	call dein#add('godlygeek/tabular')
+	call dein#add('honza/vim-snippets')
+	call dein#add('jalvesaq/nvim-r')
+	call dein#add('jonathanfilip/vim-lucius') " you'll have to symlink or move the lucius.vim file into ~/.vim/colors/ directory for this to work
+	call dein#add('jpalardy/vim-slime')
+	call dein#add('junegunn/vim-easy-align')
+	call dein#add('majutsushi/tagbar')
+	call dein#add('mbbill/undotree')
+	call dein#add('osyo-manga/unite-quickfix')
+	call dein#add('rking/ag.vim')             " You'll have to install silversearcher-ag from command line
+	call dein#add('scrooloose/nerdtree')
+	call dein#add('scrooloose/syntastic')
+	call dein#add('Shougo/context_filetype.vim')
+	call dein#add('Shougo/neocomplete.vim')
+	call dein#add('Shougo/neoinclude.vim')
+	call dein#add('Shougo/neomru.vim')
+	call dein#add('Shougo/neoyank.vim')
+	call dein#add('Shougo/unite-outline')
+	call dein#add('Shougo/unite.vim')         " You may have to update it to the latest (possibly unstable) version of Vim to stop this freezing your vim
+	call dein#add('Shougo/vimproc.vim', {'build': 'make'})
+	call dein#add('SirVer/ultisnips')
+	call dein#add('termoshtt/unite-bibtex')   " You need to install pybtex from the command line for this to work
+	call dein#add('thinca/vim-unite-history')
+	call dein#add('tpope/vim-commentary')
+	call dein#add('kana/vim-submode')
+	call dein#add('tpope/vim-dispatch')
+	call dein#add('tpope/vim-fugitive')
+	call dein#add('tpope/vim-repeat')
+	call dein#add('tpope/vim-surround')
+	call dein#add('tsukkee/unite-help')
+	call dein#add('tsukkee/unite-tag')
+	call dein#add('ujihisa/unite-colorscheme')
+	" call dein#add('xolox/vim-easytags')       " You need to install exuberant-ctags
+	call dein#add('xolox/vim-misc')
 
-call neobundle#end()
+	call dein#end()
+	call dein#save_state()
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General Vim settings:
@@ -408,8 +410,8 @@ vmap <Tab>% :Tabularize /%<CR>
 
 " Automatically tabularize text in insert mode when | is encountered:
 " TODO: need to put these into language specific files for loading
-inoremap <Bar> <Bar><Esc>:call <SID>align('<Bar>')<CR>a
-inoremap & &<Esc>:call <SID>align('&')<CR>a
+inoremap <Bar> <Bar><Esc>:call<SID>align('<Bar>')<CR>a
+inoremap & &<Esc>:call<SID>align('&')<CR>a
 
 " Function to generalise Tim Pope's gist so any character passed to the function
 " is used to automatically create tables (you will have to use a similar mapping
