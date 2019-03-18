@@ -238,7 +238,7 @@ nnoremap <silent> cob :call <SID>Togglebg()<CR>
 nnoremap <silent> <BS> :set hlsearch!<CR>
 
 " Mapping for toggling spell checking (only in normal mode):
-nnoremap <silent> <expr> <Leader>s &spell == 1 ? ":set nospell\<CR>" : ":set spell\<CR>"
+nnoremap <silent> <expr> <Leader>s ":setlocal spell! spelllang=en_nz\<CR>"
 
 " Mapping to move between incorrectly spelled words:
 call submode#enter_with('spell_check', 'n', '', '<leader>n', ']s')
