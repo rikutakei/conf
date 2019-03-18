@@ -1,4 +1,5 @@
 $include /etc/inputrc
+set completion-map-case On
 set completion-ignore-case On
 
 set editing-mode vi
