@@ -251,7 +251,7 @@ function! s:my_grep()
 endfunction
 
 " Mapping for toggling spell checking (only in normal mode):
-nnoremap <silent> <expr> <Leader>s &spell == 1 ? ":set nospell\<CR>" : ":set spell\<CR>"
+nnoremap <silent> <expr> <Leader>s ":setlocal spell! spelllang=en_nz\<CR>"
 
 " Mapping for deleting blank lines between two lines of text
 nnoremap <expr> dd (getline('.') =~ '^\s*$') ? "i\<C-r>=SmartBackSpace()\<CR>\<ESC>" : "dd"

@@ -2,6 +2,8 @@
 
 This repo contains all of the configuration files I use for most of my desktop environment.
 
+Have a look at [this markdown](vim_keymaps.md) for some example key mappings available with my config.
+
 # How do I install...
 
 ## Vim configs
@@ -10,6 +12,8 @@ The vim config is probably the most annoying to install (and probably the only o
 This is due to the use of a different vim plugin manager: version < 8.0 uses [`NeoBundle`](https://github.com/Shougo/neobundle.vim) and version >= 8.0 uses [`Dein.vim`](https://github.com/Shougo/dein.vim).
 
 So, please check your vim version first, and run stuff according to the right version.
+
+Also, you might want to install `exuberant-ctags` and `Ag` (silver searcher) to prevent some warning/error messages when opening vim.
 
 ### Version <= 8.0 (and above > 7.2)
 
