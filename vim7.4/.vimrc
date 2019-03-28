@@ -106,12 +106,11 @@ set history=1000               " Set the max number of history to remember
 set incsearch                  " Turn on incremental search
 set laststatus=2               " Always have statusline
 set list                       " Display unprintable characters
-set listchars=tab:›\ ,trail:•,extends:❯,precedes:❮ " Use these characters for unprintable characters
 set matchtime=3                " Highlight the matching paranthesis for n/10 seconds
 set nohlsearch                 " Turn on search highlighting
 set notimeout                  " Don't time out for key codes and/or mappings
 set nowrap                     " No text wrapping by default
-set number                     " turn on line number
+set relativenumber             " turn on (relative) line number
 set pumheight=5                " Set how many words are shown in the popup menu for any completion
 set ruler                      " Display the whereabouts you are in the file
 set scrolloff=8                " Minimum lines to keep above/below the line with cursor
@@ -121,13 +120,14 @@ set showmode                   " Display which mode you are in
 set smartcase                  " Turn on smart case
 set splitbelow                 " Horizontal split will split the window below
 set splitright                 " Vertical split will split the window to the right
-set ttimeout                   " Together with the line above, this will set it to time out for key codes, but not mappings
 set ttimeoutlen=10             " Set time out length to 10 milliseconds
+set ttimeout                   " Together with the line above, this will set it to time out for key codes, but not mappings
 set virtualedit=block          " Allow you to move cursor to position with no characters (e.g past eol)
-" set gdefault                 " If you want to make the g flag default for substitution, uncomment this line
 set visualbell t_vb=           " Remove visual and/or sound notification for errors
-set wildmenu                   " Show list of matches
+set wildmenu                   " Show list of matches for completion
 set wildmode=full
+" set gdefault                 " If you want to make the g flag default for substitution, uncomment this line
+set listchars=tab:›\ ,trail:•,extends:❯,precedes:❮ " Use these characters for unprintable characters
 
 " General text/comment format settings:
 set autoindent
@@ -195,17 +195,6 @@ nnoremap <Leader>q :q<CR>
 nnoremap <Leader>j :bn<CR>
 nnoremap <Leader>k :bp<CR>
 
-" Mappings for splitting windows:
-nnoremap <silent>  <C-w>-   <C-w>s
-nnoremap <silent>  <C-w>\|  <C-w>v
-nnoremap <silent> <Leader>= <C-w>=
-
-" Mappings for resizing windows:
-nnoremap <silent> <C-w>H <C-w><10
-nnoremap <silent> <C-w>L <C-w>>10
-nnoremap <silent> <C-w>J <C-w>+10
-nnoremap <silent> <C-w>K <C-w>-10
-
 " Mappings for system clipboard yank:
 nnoremap <Leader>y "+y
 vnoremap <Leader>y "+y
@@ -235,17 +224,30 @@ nnoremap <silent> cob :call <SID>Togglebg()<CR>
 " Mapping for toggling search highlighting (only in normal mode):
 nnoremap <silent> <BS> :set hlsearch!<CR>
 
+" Mapping to grep through the current file and populate quickfix list:
+nnoremap <silent> <C-g>g :call <SID>my_grep()<CR>
+
+" My (vim)grep function to grep the current file and populate the quickfix
+" list:
+function! s:my_grep()
+	call inputsave()
+	let b:word = input('grep: ')
+	call inputrestore()
+	if "\<C-[>" !~ b:word
+		try
+			:exec "vimgrep /" . b:word . "/ %"
+		catch /No match/
+			echohl WarningMsg
+			echo "Error: No words matched " . b:word
+			echohl None
+			return 1
+		endtry
+	endif
+	return 0
+endfunction
+
 " Mapping for toggling spell checking (only in normal mode):
 nnoremap <silent> <expr> <Leader>s &spell == 1 ? ":set nospell\<CR>" : ":set spell\<CR>"
-
-" Mapping to move between incorrectly spelled words:
-call submode#enter_with('spell_check', 'n', '', '<leader>n', ']s')
-call submode#map('spell_check', 'n', '', 'n', ']s')
-call submode#map('spell_check', 'n', '', 'N', '[s')
-call submode#map('spell_check', 'n', '', 'j', 'j')
-call submode#map('spell_check', 'n', '', 'k', 'k')
-call submode#map('spell_check', 'n', '', '<C-f>', '<C-f>')
-call submode#map('spell_check', 'n', '', '<C-b>', '<C-b>')
 
 " Mapping for deleting blank lines between two lines of text
 nnoremap <expr> dd (getline('.') =~ '^\s*$') ? "i\<C-r>=SmartBackSpace()\<CR>\<ESC>" : "dd"
@@ -259,7 +261,6 @@ nnoremap <F5> yi':let @/ = @"<CR>
 inoremap ) <C-r>=<SID>SkipBracket(')')<CR>
 inoremap ] <C-r>=<SID>SkipBracket(']')<CR>
 inoremap } <C-r>=<SID>SkipBracket('}')<CR>
-inoremap > <C-r>=<SID>SkipBracket('>')<CR>
 
 "Mapings to quickly make the document:
 nnoremap <Leader>m :make<CR>
@@ -296,6 +297,7 @@ nnoremap <silent> <C-g>h :<C-u>Unite -buffer-name=help        -start-insert     
 nnoremap <silent> <C-g>m :<C-u>Unite -buffer-name=mru         -start-insert            file_mru<cr>
 nnoremap <silent> <C-g>r :<C-u>Unite -buffer-name=references  -start-insert            -direction=dynamicbottom bibtex<cr>
 nnoremap <silent> <C-g>s :<C-u>Unite -buffer-name=syntastic   -direction=dynamicbottom -no-quit                 -toggle   -winheight=5 location_list<cr>
+nnoremap <silent> <C-g>e :<C-u>Unite -buffer-name=quickfix    -direction=dynamicbottom -no-quit                 -toggle     -winheight=5 quickfix<cr>
 nnoremap <silent> <C-g>t :<C-u>Unite -buffer-name=outline     -direction=aboveleft     -toggle                  -vertical -winwidth=30 outline:!<cr>
 nnoremap <silent> <C-p>  :<C-u>Unite -buffer-name=files       -start-insert            file_rec/async:!         buffer<cr>
 nnoremap <silent> <C-y>  :<C-u>Unite -buffer-name=yank        -start-insert            history/yank             -default-action=append<cr>
@@ -375,6 +377,53 @@ set runtimepath+=~/.vim/mydir/mysnips/
 nnoremap <silent> <C-g>x :UltiSnipsEdit<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Submode settings:
+
+let g:submode_always_show_submode = 1
+
+" Submode to move between incorrectly spelled words:
+call submode#enter_with('spell_check', 'n', '', '<leader>n', ']s')
+call submode#map('spell_check', 'n', '', 'n', ']s')
+call submode#map('spell_check', 'n', '', 'N', '[s')
+call submode#map('spell_check', 'n', '', 'j', 'j')
+call submode#map('spell_check', 'n', '', 'k', 'k')
+call submode#map('spell_check', 'n', '', '<C-f>', '<C-f>')
+call submode#map('spell_check', 'n', '', '<C-b>', '<C-b>')
+call submode#leave_with('spell_check', 'n', '', '<ESC>')
+
+" Submode for buffer manipulation:
+call submode#enter_with('buffer', 'n', '', '<Leader>b')
+call submode#map('buffer', 'n', '', 'j', ':bn<CR>')
+call submode#map('buffer', 'n', '', 'k', ':bp<CR>')
+call submode#map('buffer', 'n', '', 'd', ':bd<CR>')
+call submode#leave_with('buffer', 'n', '', '<ESC>')
+
+" Submode for window manipulation:
+call submode#enter_with('window', 'n', '', '<C-w>')
+call submode#map('window', 'n', '', 'h', '<C-w>h')
+call submode#map('window', 'n', '', 'j', '<C-w>j')
+call submode#map('window', 'n', '', 'k', '<C-w>k')
+call submode#map('window', 'n', '', 'l', '<C-w>l')
+call submode#map('window', 'n', '', 'q', '<C-w>q')
+call submode#map('window', 'n', '', 'r', '<C-w>r')
+call submode#map('window', 'n', '', 'R', '<C-w>R')
+" Map keys for window resizing:
+call submode#map('window', 'n', '', '=', '<C-w>=')
+call submode#map('window', 'n', '', 'H', '<C-w>>2')
+call submode#map('window', 'n', '', 'L', '<C-w><2')
+call submode#map('window', 'n', '', 'K', '<C-w>+2')
+call submode#map('window', 'n', '', 'J', '<C-w>-2')
+call submode#leave_with('window', 'n', '', '<ESC>')
+call submode#leave_with('window', 'n', '', '<C-w>')
+
+" Submode for location_list (e.g. for syntax errors):
+call submode#enter_with('location_list', 'n', '', '<C-g>l', ':lfirst<CR>')
+call submode#map('location_list', 'n', '', 'n', ':lnext<CR>')
+call submode#map('location_list', 'n', '', 'N', ':lprevious<CR>')
+call submode#leave_with('location_list', 'n', '', '<C-g>')
+call submode#leave_with('location_list', 'n', '', '<ESC>')
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Easy align settings:
 
 " Turn off foldmethod temporarily when using easy align:
@@ -430,28 +479,8 @@ endfunction
 " Surround.vim settings:
 
 " Create a dictionary for matching braces:
-let g:open_brackets = {  "{" : "}", "<" : ">",  "(" : ")",  "[" : "]", '"' : '"',  "`" : "`" }
-let g:close_brackets = { "}" : "{", ">" : "<", ")" : "(", "]" : "[",  '"' : '"',  "`" : "`" }
-
-" Function to add new pairs into the dictionary of matching pairs
-" Note: char1 must be the open bracket, and char2 is the closing bracket
-function! AddPairs(char1, char2)
-	let g:open_brackets[a:char1] = a:char2
-	let g:close_brackets[a:char2] = a:char1
-	return
-endfunction
-
-" Function to remove pairs out of the dictionary of matching pairs
-" Note: char1 must be the open bracket, and char2 is the closing bracket
-function! RemovePairs(char1, char2)
-	if has_key(g:open_brackets, a:char1) && has_key(g:close_brackets, a:char2)
-		unlet g:open_brackets[a:char1] = a:char2
-		unlet g:close_brackets[a:char2] = a:char1
-	else
-		echo "The pairs are not in the list of matching pairs."
-	endif
-	return
-endfunction
+let g:open_brackets  = { "{" : "}", "<" : ">", "(" : ")", "[" : "]", '"' : '"', "`" : "`" }
+let g:close_brackets = { "}" : "{", ">" : "<", ")" : "(", "]" : "[", '"' : '"', "`" : "`" }
 
 " Automatic surrounding brackets (see Tim Pop's surround source code):
 imap ( <Plug>Isurround)

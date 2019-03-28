@@ -54,7 +54,6 @@ if dein#load_state('~/.vim/dein')
 	call dein#add('osyo-manga/unite-quickfix')
 	call dein#add('rking/ag.vim')             " You'll have to install silversearcher-ag from command line
 	call dein#add('scrooloose/nerdtree')
-	call dein#add('scrooloose/syntastic')
 	call dein#add('Shougo/context_filetype.vim')
 	call dein#add('Shougo/neocomplete.vim')
 	call dein#add('Shougo/neoinclude.vim')
@@ -77,6 +76,7 @@ if dein#load_state('~/.vim/dein')
 	call dein#add('ujihisa/unite-colorscheme')
 	" call dein#add('xolox/vim-easytags')       " You need to install exuberant-ctags
 	call dein#add('xolox/vim-misc')
+	call dein#add('w0rp/ale')
 
 	call dein#end()
 	call dein#save_state()
@@ -113,6 +113,7 @@ set matchtime=3                " Highlight the matching paranthesis for n/10 sec
 set nohlsearch                 " Turn on search highlighting
 set notimeout                  " Don't time out for key codes and/or mappings
 set nowrap                     " No text wrapping by default
+set relativenumber             " turn on (relative) line number
 set number                     " turn on line number
 set pumheight=5                " Set how many words are shown in the popup menu for any completion
 set ruler                      " Display the whereabouts you are in the file
@@ -123,12 +124,12 @@ set showmode                   " Display which mode you are in
 set smartcase                  " Turn on smart case
 set splitbelow                 " Horizontal split will split the window below
 set splitright                 " Vertical split will split the window to the right
-set ttimeout                   " Together with the line above, this will set it to time out for key codes, but not mappings
 set ttimeoutlen=10             " Set time out length to 10 milliseconds
+set ttimeout                   " Together with the line above, this will set it to time out for key codes, but not mappings
 set virtualedit=block          " Allow you to move cursor to position with no characters (e.g past eol)
 " set gdefault                 " If you want to make the g flag default for substitution, uncomment this line
 set visualbell t_vb=           " Remove visual and/or sound notification for errors
-set wildmenu                   " Show list of matches
+set wildmenu                   " Show list of matches for completion
 set wildmode=full
 
 " General text/comment format settings:
@@ -197,17 +198,6 @@ nnoremap <Leader>q :q<CR>
 nnoremap <Leader>j :bn<CR>
 nnoremap <Leader>k :bp<CR>
 
-" Mappings for splitting windows:
-nnoremap <silent>  <C-w>-   <C-w>s
-nnoremap <silent>  <C-w>\|  <C-w>v
-nnoremap <silent> <Leader>= <C-w>=
-
-" Mappings for resizing windows:
-nnoremap <silent> <C-w>H <C-w><10
-nnoremap <silent> <C-w>L <C-w>>10
-nnoremap <silent> <C-w>J <C-w>+10
-nnoremap <silent> <C-w>K <C-w>-10
-
 " Mappings for system clipboard yank:
 nnoremap <Leader>y "+y
 vnoremap <Leader>y "+y
@@ -228,7 +218,8 @@ nnoremap S i<CR><ESC>^mwgk:silent! s/\v +$//<CR><BS>`w
 " Mapping for using dot command on the selection:
 vnoremap . :normal .<CR>
 
-" Mapping for creating folds:
+" Mapping for creating, opening, and closing folds:
+" TODO: add better mapping for folding
 vnoremap f :fold<CR>
 
 " Mapping for toggling background colour:
@@ -237,17 +228,30 @@ nnoremap <silent> cob :call <SID>Togglebg()<CR>
 " Mapping for toggling search highlighting (only in normal mode):
 nnoremap <silent> <BS> :set hlsearch!<CR>
 
+" Mapping to grep through the current file and populate quickfix list:
+nnoremap <silent> <C-g>g :call <SID>my_grep()<CR>
+
+" My (vim)grep function to grep the current file and populate the quickfix
+" list:
+function! s:my_grep()
+	call inputsave()
+	let b:word = input('grep: ')
+	call inputrestore()
+	if "\<C-[>" !~ b:word
+		try
+			:exec "vimgrep /" . b:word . "/ %"
+		catch /No match/
+			echohl WarningMsg
+			echo "Error: No words matched " . b:word
+			echohl None
+			return 1
+		endtry
+	endif
+	return 0
+endfunction
+
 " Mapping for toggling spell checking (only in normal mode):
 nnoremap <silent> <expr> <Leader>s &spell == 1 ? ":set nospell\<CR>" : ":set spell\<CR>"
-
-" Mapping to move between incorrectly spelled words:
-call submode#enter_with('spell_check', 'n', '', '<leader>n', ']s')
-call submode#map('spell_check', 'n', '', 'n', ']s')
-call submode#map('spell_check', 'n', '', 'N', '[s')
-call submode#map('spell_check', 'n', '', 'j', 'j')
-call submode#map('spell_check', 'n', '', 'k', 'k')
-call submode#map('spell_check', 'n', '', '<C-f>', '<C-f>')
-call submode#map('spell_check', 'n', '', '<C-b>', '<C-b>')
 
 " Mapping for deleting blank lines between two lines of text
 nnoremap <expr> dd (getline('.') =~ '^\s*$') ? "i\<C-r>=SmartBackSpace()\<CR>\<ESC>" : "dd"
@@ -261,7 +265,6 @@ nnoremap <F5> yi':let @/ = @"<CR>
 inoremap ) <C-r>=<SID>SkipBracket(')')<CR>
 inoremap ] <C-r>=<SID>SkipBracket(']')<CR>
 inoremap } <C-r>=<SID>SkipBracket('}')<CR>
-inoremap > <C-r>=<SID>SkipBracket('>')<CR>
 
 "Mapings to quickly make the document:
 nnoremap <Leader>m :make<CR>
@@ -278,6 +281,9 @@ autocmd BufWritePost *.tex :Make!
 "Autocommand to put the cursor at the position where I was working the last
 "time:
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+
+" Filetype-specific whitespace/tabstop setting:
+autocmd FileType r setlocal ts=4 sts=2 sw=2 expandtab
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Unite settings:
@@ -297,8 +303,9 @@ nnoremap <silent> <C-g>c :<C-u>Unite -buffer-name=colorscheme colorscheme<cr>
 nnoremap <silent> <C-g>h :<C-u>Unite -buffer-name=help        -start-insert            -direction=dynamicbottom help:!<cr>
 nnoremap <silent> <C-g>m :<C-u>Unite -buffer-name=mru         -start-insert            file_mru<cr>
 nnoremap <silent> <C-g>r :<C-u>Unite -buffer-name=references  -start-insert            -direction=dynamicbottom bibtex<cr>
-nnoremap <silent> <C-g>s :<C-u>Unite -buffer-name=syntastic   -direction=dynamicbottom -no-quit                 -toggle   -winheight=5 location_list<cr>
-nnoremap <silent> <C-g>t :<C-u>Unite -buffer-name=outline     -direction=aboveleft     -toggle                  -vertical -winwidth=30 outline:!<cr>
+nnoremap <silent> <C-g>s :<C-u>Unite -buffer-name=ALE         -direction=dynamicbottom -no-quit                 -keep-focus -toggle      -winheight=5 location_list<cr>
+nnoremap <silent> <C-g>e :<C-u>Unite -buffer-name=quickfix    -direction=dynamicbottom -no-quit                 -toggle     -winheight=5 quickfix<cr>
+nnoremap <silent> <C-g>t :<C-u>Unite -buffer-name=outline     -direction=aboveleft     -toggle                  -vertical   -winwidth=30 outline:!<cr>
 nnoremap <silent> <C-p>  :<C-u>Unite -buffer-name=files       -start-insert            file_rec/async:!         buffer<cr>
 nnoremap <silent> <C-y>  :<C-u>Unite -buffer-name=yank        -start-insert            history/yank             -default-action=append<cr>
 
@@ -377,6 +384,59 @@ set runtimepath+=~/.vim/mydir/mysnips/
 nnoremap <silent> <C-g>x :UltiSnipsEdit<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Submode settings:
+
+let g:submode_always_show_submode = 1
+
+" Submode to move between incorrectly spelled words:
+call submode#enter_with('spell_check', 'n', '', '<leader>n', ']s')
+call submode#map('spell_check', 'n', '', 'n', ']s')
+call submode#map('spell_check', 'n', '', 'N', '[s')
+call submode#map('spell_check', 'n', '', 'j', 'j')
+call submode#map('spell_check', 'n', '', 'k', 'k')
+call submode#map('spell_check', 'n', '', '<C-f>', '<C-f>')
+call submode#map('spell_check', 'n', '', '<C-b>', '<C-b>')
+call submode#leave_with('spell_check', 'n', '', '<ESC>')
+
+" Submode for buffer manipulation:
+call submode#enter_with('buffer', 'n', '', '<Leader>b')
+call submode#map('buffer', 'n', '', 'j', ':bn<CR>')
+call submode#map('buffer', 'n', '', 'k', ':bp<CR>')
+call submode#map('buffer', 'n', '', 'd', ':bd<CR>')
+call submode#leave_with('buffer', 'n', '', '<ESC>')
+
+" Submode for window manipulation:
+call submode#enter_with('window', 'n', '', '<C-w>')
+call submode#map('window', 'n', '', 'h', '<C-w>h')
+call submode#map('window', 'n', '', 'j', '<C-w>j')
+call submode#map('window', 'n', '', 'k', '<C-w>k')
+call submode#map('window', 'n', '', 'l', '<C-w>l')
+call submode#map('window', 'n', '', 'q', '<C-w>q')
+call submode#map('window', 'n', '', 'r', '<C-w>r')
+call submode#map('window', 'n', '', 'R', '<C-w>R')
+" Map keys for window resizing:
+call submode#map('window', 'n', '', '=', '<C-w>=')
+call submode#map('window', 'n', '', 'H', '<C-w>>2')
+call submode#map('window', 'n', '', 'L', '<C-w><2')
+call submode#map('window', 'n', '', 'K', '<C-w>+2')
+call submode#map('window', 'n', '', 'J', '<C-w>-2')
+call submode#leave_with('window', 'n', '', '<ESC>')
+call submode#leave_with('window', 'n', '', '<C-w>')
+
+" Submode for quickfix lsit (e.g. for compilation error or grep results):
+call submode#enter_with('location_list', 'n', '', '<C-g>l', ':lfirst<CR>')
+call submode#map('location_list', 'n', '', 'n', ':lnext<CR>')
+call submode#map('location_list', 'n', '', 'N', ':lprevious<CR>')
+call submode#leave_with('location_list', 'n', '', '<C-g>')
+call submode#leave_with('location_list', 'n', '', '<ESC>')
+
+" Submode for location list (e.g. for syntax errors):
+call submode#enter_with('quickfix', 'n', '', '<Leader>e', ':cfirst<CR>')
+call submode#map('quickfix', 'n', '', 'n', ':cnext<CR>')
+call submode#map('quickfix', 'n', '', 'N', ':cprevious<CR>')
+call submode#leave_with('quickfix', 'n', '', '<ESC>')
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Easy align settings:
 
 " Turn off foldmethod temporarily when using easy align:
@@ -432,30 +492,10 @@ endfunction
 " Surround.vim settings:
 
 " Create a dictionary for matching braces:
-let g:open_brackets = {  "{" : "}", "<" : ">",  "(" : ")",  "[" : "]", '"' : '"',  "`" : "`" }
-let g:close_brackets = { "}" : "{", ">" : "<", ")" : "(", "]" : "[",  '"' : '"',  "`" : "`" }
+let g:open_brackets  = { "{" : "}", "<" : ">", "(" : ")", "[" : "]", '"' : '"', "`" : "`" }
+let g:close_brackets = { "}" : "{", ">" : "<", ")" : "(", "]" : "[", '"' : '"', "`" : "`" }
 
-" Function to add new pairs into the dictionary of matching pairs
-" Note: char1 must be the open bracket, and char2 is the closing bracket
-function! AddPairs(char1, char2)
-	let g:open_brackets[a:char1] = a:char2
-	let g:close_brackets[a:char2] = a:char1
-	return
-endfunction
-
-" Function to remove pairs out of the dictionary of matching pairs
-" Note: char1 must be the open bracket, and char2 is the closing bracket
-function! RemovePairs(char1, char2)
-	if has_key(g:open_brackets, a:char1) && has_key(g:close_brackets, a:char2)
-		unlet g:open_brackets[a:char1] = a:char2
-		unlet g:close_brackets[a:char2] = a:char1
-	else
-		echo "The pairs are not in the list of matching pairs."
-	endif
-	return
-endfunction
-
-" Automatic surrounding brackets (see Tim Pop's surround source code):
+" Automatic surrounding brackets (see Tim Pope's surround source code):
 imap ( <Plug>Isurround)
 imap { <Plug>Isurround}
 imap [ <Plug>Isurround]
@@ -502,16 +542,6 @@ let R_objbr_labelerr = 1  " Warn if label is not a valid text
 
 " " Completion setup:
 " let R_show_args = 1
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Syntastic settings:
-
-" Show the sytax errors in quick fix list when file is opened:
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 0
-let g:syntastic_check_on_open = 0
-let g:syntastic_check_on_wq = 0
-let g:syntastic_loc_list_height= 5
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Undotree settings:
