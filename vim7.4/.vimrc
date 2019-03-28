@@ -416,12 +416,18 @@ call submode#map('window', 'n', '', 'J', '<C-w>-2')
 call submode#leave_with('window', 'n', '', '<ESC>')
 call submode#leave_with('window', 'n', '', '<C-w>')
 
-" Submode for location_list (e.g. for syntax errors):
+" Submode for quickfix lsit (e.g. for compilation error or grep results):
 call submode#enter_with('location_list', 'n', '', '<C-g>l', ':lfirst<CR>')
 call submode#map('location_list', 'n', '', 'n', ':lnext<CR>')
 call submode#map('location_list', 'n', '', 'N', ':lprevious<CR>')
 call submode#leave_with('location_list', 'n', '', '<C-g>')
 call submode#leave_with('location_list', 'n', '', '<ESC>')
+
+" Submode for location list (e.g. for syntax errors):
+call submode#enter_with('quickfix', 'n', '', '<Leader>e', ':cfirst<CR>')
+call submode#map('quickfix', 'n', '', 'n', ':cnext<CR>')
+call submode#map('quickfix', 'n', '', 'N', ':cprevious<CR>')
+call submode#leave_with('quickfix', 'n', '', '<ESC>')
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Easy align settings:
